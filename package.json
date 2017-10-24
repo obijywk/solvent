@@ -1,0 +1,22 @@
+{
+  "name": "solvent",
+  "version": "0.0.1",
+  "description": "Puzzle solving toolbox",
+  "author": {
+    "name": "Matt Gruskin",
+    "email": "matthew.gruskin@gmail.com"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^0.28.7",
+    "ts-loader": "^3.0.5",
+    "typescript": "^2.5.3",
+    "vue": "^2.5.2",
+    "vue-loader": "^13.3.0",
+    "vue-template-compiler": "^2.5.2",
+    "webpack": "^3.8.1"
+  },
+  "scripts": {
+    "build": "webpack"
+  }
+}
