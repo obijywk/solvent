@@ -16,7 +16,9 @@
       <v-flex>
         <v-container fluid grid-list-md>
           <v-layout row wrap>
-            <braille-card-component @addLetter="addLetter($event)" />
+            <v-card>
+              <braille-picker-component @addLetter="addLetter($event)" />
+            </v-card>
           </v-layout>
         </v-container>
       </v-flex>
@@ -28,11 +30,11 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
-import BrailleCardComponent from "./BrailleCard.vue";
+import BraillePickerComponent from "./BraillePicker.vue";
 
 @Component({
   components: {
-    BrailleCardComponent
+    BraillePickerComponent
   }
 })
 export default class CodesTab extends Vue {
