@@ -1,17 +1,17 @@
 <template>
-  <v-app dark id="solvent">
+  <v-app id="solvent">
     <v-tabs>
-      <v-tabs-bar>
+      <v-tabs-bar class="blue-grey lighten-4">
         <v-tabs-item href="#codes">Codes</v-tabs-item>
         <v-tabs-item href="#ciphers">Ciphers</v-tabs-item>
         <v-tabs-slider></v-tabs-slider>
       </v-tabs-bar>
       <v-tabs-items>
         <v-tabs-content id="codes">
-          <codes-tab-component></codes-tab-component>
+          <codes-tab-component />
         </v-tabs-content>
         <v-tabs-content id="ciphers">
-          <ciphers-tab-component></ciphers-tab-component>
+          <ciphers-tab-component />
         </v-tabs-content>
       </v-tabs-items>
     </v-tabs>
