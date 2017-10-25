@@ -1,13 +1,15 @@
 import Vue from "vue";
+import Vuetify from "vuetify";
+import "vuetify/dist/vuetify.min.css";
 
-let v = new Vue({
+import AppComponent from "./components/App.vue";
+
+Vue.use(Vuetify);
+
+new Vue({
   el: "#app",
-  template: `
-  <div>
-    Hello {{ name }}!
-  </div>
-  `,
-  data: {
-    name: "World"
+  template: "<app-component />",
+  components: {
+    AppComponent
   }
 });
