@@ -7,6 +7,12 @@
       </v-flex>
     </v-layout>
     <v-layout row>
+      <v-btn color="error" @click="clear">Clear</v-btn>
+      <v-btn color="error" @click="backspace">Backspace</v-btn>
+      <v-btn color="primary" @click="addLetter(' ')">Space</v-btn>
+      <v-btn color="primary" @click="copy">Copy</v-btn>
+    </v-layout>
+    <v-layout row>
       <v-flex>
         <v-container fluid grid-list-md>
           <v-layout row wrap>
@@ -34,6 +40,17 @@ export default class CodesTab extends Vue {
 
   addLetter(letter: string) {
     this.text += letter;
+  }
+
+  clear() {
+    this.text = "";
+  }
+
+  backspace() {
+    this.text = this.text.slice(0, this.text.length - 1);
+  }
+
+  copy() {
   }
 }
 </script>
