@@ -1,13 +1,11 @@
 <template>
-  <v-container fluid id="codes-tab-container">
-    <v-layout row>
-      <v-flex>
-        <v-text-field id="text" label="Text" textarea rows="3" v-model="text">
-        </v-text-field>
-      </v-flex>
-    </v-layout>
+  <div id="codes-tab-container">
+    <div id="codes-tab-text-container">
+      <v-text-field id="codes-tab-text" label="Text" textarea rows="3" v-model="text">
+      </v-text-field>
+    </div>
 
-    <v-layout row wrap align-center>
+    <div id="codes-tab-buttons">
       <v-tooltip top>
         <v-btn slot="activator" fab small color="error" @click="clear">
           <v-icon>delete_forever</v-icon>
@@ -35,31 +33,29 @@
         </v-btn>
         <span>Copy to clipboard</span>
       </v-tooltip>
-    </v-layout>
+    </div>
 
-    <v-layout row>
-      <v-flex>
-        <v-container class="hidden-sm-and-down" fluid grid-list-md>
-          <v-layout row wrap>
-            <v-card>
-              <braille-picker-component @addLetter="addLetter($event)" />
-            </v-card>
-          </v-layout>
-        </v-container>
-        <v-tabs class="hidden-md-and-up">
-          <v-tabs-bar class="blue-grey lighten-4">
-            <v-tabs-item href="#braille-tab">Braille</v-tabs-item>
-            <v-tabs-slider></v-tabs-slider>
-          </v-tabs-bar>
-          <v-tabs-items>
-            <v-tabs-content id="braille-tab" lazy>
-              <braille-picker-component @addLetter="addLetter($event)" />
-            </v-tabs-content>
-          </v-tabs-items>
-        </v-tabs>
-      </v-flex>
-    </v-layout>
-  </v-container>
+    <div id="codes-tab-pickers">
+      <v-container class="hidden-sm-and-down" fluid grid-list-md>
+        <v-layout row wrap>
+          <v-card>
+            <braille-picker-component @addLetter="addLetter($event)" />
+          </v-card>
+        </v-layout>
+      </v-container>
+      <v-tabs class="hidden-md-and-up">
+        <v-tabs-bar class="blue-grey lighten-4">
+          <v-tabs-item href="#braille-tab">Braille</v-tabs-item>
+          <v-tabs-slider></v-tabs-slider>
+        </v-tabs-bar>
+        <v-tabs-items>
+          <v-tabs-content id="braille-tab" lazy>
+            <braille-picker-component @addLetter="addLetter($event)" />
+          </v-tabs-content>
+        </v-tabs-items>
+      </v-tabs>
+    </div>
+  </div>
 </template>
 
 <style>
@@ -67,7 +63,20 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+}
+#codes-tab-text-container {
+  flex: 0;
+  margin: 16px;
+}
+#codes-tab-buttons {
+  margin-left: 16px;
+  margin-right: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+#codes-tab-pickers {
+  margin-top: auto;
+  margin-bottom: 48px;
 }
 </style>
 
@@ -98,7 +107,7 @@ export default class CodesTab extends Vue {
   }
 
   copy() {
-    const textArea: HTMLTextAreaElement = <HTMLTextAreaElement>document.querySelector("#text");
+    const textArea: HTMLTextAreaElement = <HTMLTextAreaElement>document.querySelector("#codes-tab-text");
     textArea.select();
     document.execCommand("copy");
   }
