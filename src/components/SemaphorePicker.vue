@@ -24,6 +24,7 @@
 }
 #semaphore-picker-svg circle {
   cursor: pointer;
+  transition: fill 0.25s;
 }
 #semaphore-picker-svg circle.unpicked {
   fill: white;
@@ -48,9 +49,9 @@ class FlagPosition {
 
   cssClass() {
     if (this.selected) {
-      return 'picked';
+      return "picked";
     }
-    return 'unpicked';
+    return "unpicked";
   }
 }
 
