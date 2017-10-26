@@ -37,7 +37,7 @@
 
     <div id="codes-tab-pickers">
       <v-container class="hidden-sm-and-down" fluid grid-list-md>
-        <v-layout row wrap>
+        <v-layout row wrap id="codes-tab-picker-cards">
           <v-card>
             <braille-picker-component @addLetter="addLetter($event)" />
           </v-card>
@@ -91,6 +91,9 @@
 #codes-tab-pickers {
   margin-top: auto;
   margin-bottom: 48px;
+}
+#codes-tab-picker-cards > .card {
+  margin: 16px;
 }
 </style>
 
