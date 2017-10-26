@@ -44,12 +44,16 @@
           <v-card>
             <morse-picker-component @addLetter="addLetter($event)" />
           </v-card>
+          <v-card>
+            <semaphore-picker-component @addLetter="addLetter($event)" />
+          </v-card>
         </v-layout>
       </v-container>
       <v-tabs class="hidden-md-and-up">
         <v-tabs-bar class="blue-grey lighten-4">
           <v-tabs-item href="#braille-tab">Braille</v-tabs-item>
           <v-tabs-item href="#morse-tab">Morse</v-tabs-item>
+          <v-tabs-item href="#semaphore-tab">Semaphore</v-tabs-item>
           <v-tabs-slider></v-tabs-slider>
         </v-tabs-bar>
         <v-tabs-items>
@@ -58,6 +62,9 @@
           </v-tabs-content>
           <v-tabs-content id="morse-tab" lazy>
             <morse-picker-component @addLetter="addLetter($event)" />
+          </v-tabs-content>
+          <v-tabs-content id="semaphore-tab" lazy>
+            <semaphore-picker-component @addLetter="addLetter($event)" />
           </v-tabs-content>
         </v-tabs-items>
       </v-tabs>
@@ -93,11 +100,13 @@ import { Component, Prop } from "vue-property-decorator";
 
 import BraillePickerComponent from "./BraillePicker.vue";
 import MorsePickerComponent from "./MorsePicker.vue";
+import SemaphorePickerComponent from "./SemaphorePicker.vue";
 
 @Component({
   components: {
     BraillePickerComponent,
     MorsePickerComponent,
+    SemaphorePickerComponent,
   }
 })
 export default class CodesTab extends Vue {
