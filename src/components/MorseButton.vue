@@ -18,6 +18,7 @@
   height: 36px;
   min-width: 60px;
   justify-content: left;
+  font-family: 'Roboto Mono', monospace;
 }
 .morse-letter {
   min-width: 20px;
