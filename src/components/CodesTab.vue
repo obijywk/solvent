@@ -20,7 +20,7 @@
         <span>Backspace</span>
       </v-tooltip>
 
-      <v-tooltip top>
+      <v-tooltip top style="margin-left: auto">
         <v-btn slot="activator" fab small color="primary" @click="addLetter(' ')">
           <v-icon>forward</v-icon>
         </v-btn>
@@ -41,16 +41,23 @@
           <v-card>
             <braille-picker-component @addLetter="addLetter($event)" />
           </v-card>
+          <v-card>
+            <morse-picker-component @addLetter="addLetter($event)" />
+          </v-card>
         </v-layout>
       </v-container>
       <v-tabs class="hidden-md-and-up">
         <v-tabs-bar class="blue-grey lighten-4">
           <v-tabs-item href="#braille-tab">Braille</v-tabs-item>
+          <v-tabs-item href="#morse-tab">Morse</v-tabs-item>
           <v-tabs-slider></v-tabs-slider>
         </v-tabs-bar>
         <v-tabs-items>
           <v-tabs-content id="braille-tab" lazy>
             <braille-picker-component @addLetter="addLetter($event)" />
+          </v-tabs-content>
+          <v-tabs-content id="morse-tab" lazy>
+            <morse-picker-component @addLetter="addLetter($event)" />
           </v-tabs-content>
         </v-tabs-items>
       </v-tabs>
@@ -85,10 +92,12 @@ import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
 import BraillePickerComponent from "./BraillePicker.vue";
+import MorsePickerComponent from "./MorsePicker.vue";
 
 @Component({
   components: {
-    BraillePickerComponent
+    BraillePickerComponent,
+    MorsePickerComponent,
   }
 })
 export default class CodesTab extends Vue {
