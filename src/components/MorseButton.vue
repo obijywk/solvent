@@ -32,19 +32,19 @@ import { Component, Prop } from "vue-property-decorator";
 @Component
 export default class MorseButton extends Vue {
   @Prop()
-  letter: string;
+  private letter: string;
 
   @Prop()
-  morse: string;
+  private morse: string;
 
-  displayLetter(): string {
-    if (this.letter == " ") {
+  private displayLetter(): string {
+    if (this.letter === " ") {
       return "_";
     }
     return this.letter;
   }
 
-  click() {
+  private click() {
     this.$emit("addLetter", this.letter);
   }
 }

@@ -132,10 +132,10 @@ import MorseButtonComponent from "./MorseButton.vue";
 @Component({
   components: {
     MorseButtonComponent,
-  }
+  },
 })
 export default class MorsePicker extends Vue {
-  addLetter(letter: string) {
+  private addLetter(letter: string) {
     this.$emit("addLetter", letter);
   }
 }

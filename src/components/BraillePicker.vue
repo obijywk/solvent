@@ -49,11 +49,11 @@ import BrailleButtonComponent from "./BrailleButton.vue";
 
 @Component({
   components: {
-    BrailleButtonComponent
-  }
+    BrailleButtonComponent,
+  },
 })
 export default class BraillePicker extends Vue {
-  addLetter(letter: string) {
+  private addLetter(letter: string) {
     this.$emit("addLetter", letter);
   }
 }

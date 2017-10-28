@@ -6,10 +6,10 @@ import AppComponent from "./components/App.vue";
 
 Vue.use(Vuetify);
 
-new Vue({
+const vue = new Vue({
+  components: {
+    AppComponent,
+  },
   el: "#app",
   template: "<app-component />",
-  components: {
-    AppComponent
-  }
 });

@@ -37,6 +37,8 @@
 import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
+/* tslint:disable:no-bitwise */
+
 const BRAILLE: { [letter: string]: number } = {
   A: 0b100000,
   B: 0b101000,
@@ -63,7 +65,7 @@ const BRAILLE: { [letter: string]: number } = {
   W: 0b011101,
   X: 0b110011,
   Y: 0b110111,
-  Z: 0b100111
+  Z: 0b100111,
 };
 
 function popCount(x: number): number {
@@ -77,9 +79,10 @@ function popCount(x: number): number {
 
 @Component
 export default class BrailleButton extends Vue {
-  @Prop() letter: string;
+  @Prop()
+  private letter: string;
 
-  colorClasses(): string[] {
+  private colorClasses(): string[] {
     const bitPattern = BRAILLE[this.letter];
     const dotCount = popCount(bitPattern);
     switch (dotCount) {
@@ -99,14 +102,14 @@ export default class BrailleButton extends Vue {
     return [];
   }
 
-  dotColor(bit: number) {
+  private dotColor(bit: number) {
     if (bit & BRAILLE[this.letter]) {
       return "black";
     }
     return "white";
   }
 
-  click() {
+  private click() {
     this.$emit("addLetter", this.letter);
   }
 }

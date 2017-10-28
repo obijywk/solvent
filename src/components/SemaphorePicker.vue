@@ -62,17 +62,17 @@ import Vue from "vue";
 import { Component, Provide } from "vue-property-decorator";
 
 class FlagPosition {
-  selected: boolean = false;
-  previouslySelected: boolean = false;
+  public selected: boolean = false;
+  public previouslySelected: boolean = false;
 
   constructor(public index: number, public angle: number) {
   }
 
-  cssClass() {
+  public cssClass() {
     if (this.selected) {
       return "picked";
     } else if (this.previouslySelected) {
-      return "last-picked"
+      return "last-picked";
     } else {
       return "unpicked";
     }
@@ -80,7 +80,7 @@ class FlagPosition {
 }
 
 class FlagPositionPair {
-  constructor(public a: FlagPosition, public b: FlagPosition) {
+  constructor(private a: FlagPosition, private b: FlagPosition) {
     if (a.index > b.index) {
       const temp = a;
       a = b;
@@ -88,7 +88,7 @@ class FlagPositionPair {
     }
   }
 
-  key(): string {
+  public key(): string {
     return `${this.a.index}${this.b.index}`;
   }
 }
@@ -99,6 +99,7 @@ for (let i = 0; i < 8; i++) {
   FLAG_POSITIONS.push(new FlagPosition(i, angle));
 }
 
+/* tslint:disable:object-literal-sort-keys */
 const SEMAPHORE_TABLE: { [key: string]: string; } = {
   "45": "A",
   "46": "B",
@@ -127,28 +128,29 @@ const SEMAPHORE_TABLE: { [key: string]: string; } = {
   "27": "Y",
   "23": "Z",
 };
+/* tslint:enable:object-literal-sort-keys */
 
 @Component
 export default class SemaphorePicker extends Vue {
   @Provide()
-  flagPositions: FlagPosition[] = FLAG_POSITIONS;
+  private flagPositions: FlagPosition[] = FLAG_POSITIONS;
 
-  spaceLastSelected: boolean = false;
+  private spaceLastSelected: boolean = false;
 
-  pickPosition(flagPosition: FlagPosition) {
+  private pickPosition(flagPosition: FlagPosition) {
     flagPosition.selected = !flagPosition.selected;
     this.maybeAddLetter();
   }
 
-  pickSpace() {
+  private pickSpace() {
     this.$emit("addLetter", " ");
     this.updateSelections();
     this.spaceLastSelected = true;
   }
 
-  maybeAddLetter() {
-    const pickedPositions = this.flagPositions.filter(flagPosition => flagPosition.selected);
-    if (pickedPositions.length != 2) {
+  private maybeAddLetter() {
+    const pickedPositions = this.flagPositions.filter((flagPosition) => flagPosition.selected);
+    if (pickedPositions.length !== 2) {
       return;
     }
 
@@ -161,7 +163,7 @@ export default class SemaphorePicker extends Vue {
     this.updateSelections();
   }
 
-  updateSelections() {
+  private updateSelections() {
     this.spaceLastSelected = false;
     for (const flagPosition of this.flagPositions) {
       flagPosition.previouslySelected = false;

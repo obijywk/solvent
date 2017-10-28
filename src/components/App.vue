@@ -37,9 +37,9 @@ import CodesTabComponent from "./CodesTab.vue";
 
 @Component({
   components: {
-    CodesTabComponent,
     CiphersTabComponent,
-  }
+    CodesTabComponent,
+  },
 })
 export default class App extends Vue {
 }

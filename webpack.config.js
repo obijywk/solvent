@@ -20,6 +20,7 @@ module.exports = {
             // other preprocessors should work out of the box, no loader config like this necessary.
             'scss': 'vue-style-loader!css-loader!sass-loader',
             'sass': 'vue-style-loader!css-loader!sass-loader?indentedSyntax',
+            'ts': 'ts-loader!tslint-loader',
           }
           // other vue-loader options go here
         }

@@ -10,11 +10,11 @@ function loadQuadgrams(): Promise<void> {
     const input = fs.createReadStream("data/english_quadgrams.txt.gz").pipe(zlib.createGunzip());
     const lineReader = readline.createInterface({ input });
 
-    const quadgramFrequencies: {quadgram: string, frequency: number}[] = [];
+    const quadgramFrequencies: Array<{quadgram: string, frequency: number}> = [];
     let n: number = 0;
-    lineReader.on("line", line => {
+    lineReader.on("line", (line) => {
       const parts = line.split(" ");
-      const quadgramFrequency = {quadgram: parts[0], frequency: parseInt(parts[1])};
+      const quadgramFrequency = {quadgram: parts[0], frequency: parseInt(parts[1], 10)};
       quadgramFrequencies.push(quadgramFrequency);
       n += quadgramFrequency.frequency;
     });
@@ -33,15 +33,15 @@ export const initialized = loadQuadgrams();
 
 export function score(text: string): number {
   const strippedText = text.toUpperCase().replace(/[^A-Z]/g, "");
-  let score: number = 0;
+  let textScore: number = 0;
   for (let i = 0; i <= strippedText.length - 4; i++) {
     const quadgram = strippedText.substring(i, i + 4);
     const quadgramLogProb = quadgramLogProbs[quadgram];
     if (quadgramLogProb !== undefined) {
-      score += quadgramLogProb;
+      textScore += quadgramLogProb;
     } else {
-      score += floorLogProb;
+      textScore += floorLogProb;
     }
   }
-  return score;
+  return textScore;
 }

@@ -115,25 +115,25 @@ import SemaphorePickerComponent from "./SemaphorePicker.vue";
     BraillePickerComponent,
     MorsePickerComponent,
     SemaphorePickerComponent,
-  }
+  },
 })
 export default class CodesTab extends Vue {
-  text: string = "";
+  private text: string = "";
 
-  addLetter(letter: string) {
+  private addLetter(letter: string) {
     this.text += letter;
   }
 
-  clear() {
+  private clear() {
     this.text = "";
   }
 
-  backspace() {
+  private backspace() {
     this.text = this.text.slice(0, this.text.length - 1);
   }
 
-  copy() {
-    const textArea: HTMLTextAreaElement = <HTMLTextAreaElement>document.querySelector("#codes-tab-text");
+  private copy() {
+    const textArea: HTMLTextAreaElement = document.querySelector("#codes-tab-text") as HTMLTextAreaElement;
     textArea.select();
     document.execCommand("copy");
   }
