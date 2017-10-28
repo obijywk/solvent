@@ -1,6 +1,6 @@
 <template>
   <v-btn flat @click="click" class="morse-button">
-    <span class="morse-letter">{{ letter }}</span>
+    <span class="morse-letter">{{ displayLetter() }}</span>
     <span class="morse-code">{{ morse }}</span>
   </v-btn>
 </template>
@@ -36,6 +36,13 @@ export default class MorseButton extends Vue {
 
   @Prop()
   morse: string;
+
+  displayLetter(): string {
+    if (this.letter == " ") {
+      return "_";
+    }
+    return this.letter;
+  }
 
   click() {
     this.$emit("addLetter", this.letter);

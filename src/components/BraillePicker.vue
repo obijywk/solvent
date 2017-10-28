@@ -1,26 +1,43 @@
 <template>
-  <v-container grid-list-xs class="braille-grid-container">
-    <v-layout row>
-      <v-flex v-for="letter in 'AKDFMGXTQ'" :key="letter">
-        <braille-button-component :letter="letter" @addLetter="addLetter($event)" />
-      </v-flex>
-    </v-layout>
-    <v-layout row>
-      <v-flex v-for="letter in 'EIJHUPVRY'" :key="letter">
-        <braille-button-component :letter="letter" @addLetter="addLetter($event)" />
-      </v-flex>
-    </v-layout>
-    <v-layout row>
-      <v-flex v-for="letter in 'BCLSONZW '" :key="letter">
-        <braille-button-component :letter="letter" @addLetter="addLetter($event)" />
-      </v-flex>
-    </v-layout>
-  </v-container>
+  <div id="braille-picker-container">
+    <div class="braille-picker-row">
+      <braille-button-component
+        v-for="letter in 'AKDFMGXTQ'"
+        :key="letter"
+        :letter="letter"
+        @addLetter="addLetter($event)" />
+    </div>
+    <div class="braille-picker-row">
+      <braille-button-component
+        v-for="letter in 'EIJHUPVRY'"
+        :key="letter"
+        :letter="letter"
+        @addLetter="addLetter($event)" />
+    </div>
+    <div class="braille-picker-row">
+      <braille-button-component
+        v-for="letter in 'BCLSONZW '"
+        :key="letter"
+        :letter="letter"
+        @addLetter="addLetter($event)" />
+    </div>
+  </div>
 </template>
 
 <style>
-.braille-grid-container .layout .flex {
-  padding: 2px !important;
+#braille-picker-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.braille-picker-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+.braille-picker-row button {
+  flex: 1;
 }
 </style>
 

@@ -9,6 +9,20 @@
         :class="flagPosition.cssClass()"
         @click="pickPosition(flagPosition)"
       />
+      <g @click="pickSpace()">
+        <circle
+          cx="128" cy="128" r="24" stroke="black"
+          :class="{ 'unpicked': !spaceLastSelected, 'last-picked': spaceLastSelected }"
+        />
+        <text
+          x="128" y="140"
+          font-family="Roboto" font-size="14"
+          text-anchor="middle"
+          cursor="pointer"
+        >
+          _
+        </text>
+      </g>
     </svg>
   </div>
 </template>
@@ -32,8 +46,14 @@
 #semaphore-picker-svg circle.picked {
   fill: gold;
 }
-#semaphore-picker-svg circle.unpicked:hover {
+#semaphore-picker-svg circle.last-picked {
   fill: #ccc;
+}
+@media(hover:hover) {
+  #semaphore-picker-svg circle.unpicked:hover,
+  #semaphore-picker-svg g:hover circle.unpicked {
+    fill: #ccc;
+  }
 }
 </style>
 
@@ -43,6 +63,7 @@ import { Component, Provide } from "vue-property-decorator";
 
 class FlagPosition {
   selected: boolean = false;
+  previouslySelected: boolean = false;
 
   constructor(public index: number, public angle: number) {
   }
@@ -50,8 +71,11 @@ class FlagPosition {
   cssClass() {
     if (this.selected) {
       return "picked";
+    } else if (this.previouslySelected) {
+      return "last-picked"
+    } else {
+      return "unpicked";
     }
-    return "unpicked";
   }
 }
 
@@ -109,9 +133,17 @@ export default class SemaphorePicker extends Vue {
   @Provide()
   flagPositions: FlagPosition[] = FLAG_POSITIONS;
 
+  spaceLastSelected: boolean = false;
+
   pickPosition(flagPosition: FlagPosition) {
     flagPosition.selected = !flagPosition.selected;
     this.maybeAddLetter();
+  }
+
+  pickSpace() {
+    this.$emit("addLetter", " ");
+    this.updateSelections();
+    this.spaceLastSelected = true;
   }
 
   maybeAddLetter() {
@@ -126,8 +158,17 @@ export default class SemaphorePicker extends Vue {
       this.$emit("addLetter", letter);
     }
 
-    for (const flagPosition of pickedPositions) {
-      flagPosition.selected = false;
+    this.updateSelections();
+  }
+
+  updateSelections() {
+    this.spaceLastSelected = false;
+    for (const flagPosition of this.flagPositions) {
+      flagPosition.previouslySelected = false;
+      if (flagPosition.selected) {
+        flagPosition.selected = false;
+        flagPosition.previouslySelected = true;
+      }
     }
   }
 }

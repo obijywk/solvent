@@ -18,6 +18,7 @@
         <div id="morse-one-dot-one-dash-column">
           <morse-button-component letter="A" morse=".-" @addLetter="addLetter($event)" />
           <morse-button-component letter="N" morse="-." @addLetter="addLetter($event)" />
+          <morse-button-component id="morse-space-button" letter=" " morse="" @addLetter="addLetter($event)" />
         </div>
         <div id="morse-one-dot-two-dash-column">
           <morse-button-component letter="W" morse=".--" @addLetter="addLetter($event)" />
@@ -70,7 +71,9 @@
 #morse-all-dash-column {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  border-left: 1px solid black;
 }
 #morse-heterogeneous-column {
   display: flex;
@@ -78,7 +81,9 @@
 }
 #morse-one-dot-row {
   display: flex;
-  border: 1px solid black;
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
 }
 #morse-one-dot-one-dash-column {
   display: flex;
@@ -94,22 +99,27 @@
 }
 #morse-multiple-dots-row {
   display: flex;
+  border-bottom: 1px solid black;
 }
 #morse-two-dot-two-dash-column {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  border-right: 1px solid black;
 }
 #morse-two-dot-one-dash-column {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border: 1px solid black;
+  border-right: 1px solid black;
 }
 #morse-three-dot-one-dash-column {
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
+  border-right: 1px solid black;
+}
+#morse-space-button {
+  border-top: 1px solid black;
+  border-right: 1px solid black;
 }
 </style>
 
