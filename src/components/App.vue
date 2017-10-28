@@ -22,6 +22,10 @@
 .full-height {
   height: 100%;
 }
+.credits {
+  font-style: italic;
+  margin: 16px;
+}
 </style>
 
 <script lang="ts">
@@ -38,6 +42,5 @@ import CodesTabComponent from "./CodesTab.vue";
   }
 })
 export default class App extends Vue {
-
 }
 </script>

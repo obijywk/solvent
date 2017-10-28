@@ -1,5 +1,10 @@
 <template>
   <div id="codes-tab-container">
+    <p class="credits">
+      Inspired by the
+      <a href="http://www.derf.net/encodings/codesheet.pdf" target="_blank">derf.net codesheet</a>.
+    </p>
+
     <div id="codes-tab-text-container">
       <v-text-field id="codes-tab-text" label="Text" textarea rows="3" v-model="text">
       </v-text-field>

@@ -24,7 +24,7 @@
 .braille-button {
   width: 28px;
   min-width: 28px;
-  height: 72px;
+  height: 85.33px;
   margin: 0;
 }
 .braille-button .btn__content {
