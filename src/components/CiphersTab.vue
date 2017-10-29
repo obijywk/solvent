@@ -15,10 +15,20 @@
       <v-btn @click="caesarShift()">
         Caesar Shift
       </v-btn>
+      <v-btn @click="substitution()">
+        Solve Substitution
+      </v-btn>
     </div>
 
     <div id="ciphers-tab-outputs">
-      <caesar-shifter-component ref="caesar-shifter" :inputString="text" />
+      <caesar-shifter-component ref="caesar-shifter"
+        v-show="activeComponent === ActiveComponent.CAESAR_SHIFTER"
+        :inputString="text"
+      />
+      <cipher-solver-component ref="cipher-solver"
+        v-show="activeComponent === ActiveComponent.CIPHER_SOLVER"
+        :inputString="text"
+      />
     </div>
   </div>
 </template>
@@ -55,17 +65,33 @@ import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
 import CaesarShifterComponent from "./CaesarShifter.vue";
+import CipherSolverComponent from "./CipherSolver.vue";
+
+enum ActiveComponent {
+  CAESAR_SHIFTER,
+  CIPHER_SOLVER,
+}
 
 @Component({
   components: {
     CaesarShifterComponent,
+    CipherSolverComponent,
   },
 })
 export default class CiphersTab extends Vue {
   private text: string = "";
 
+  private ActiveComponent = ActiveComponent;
+  private activeComponent: ActiveComponent = ActiveComponent.CAESAR_SHIFTER;
+
   private caesarShift() {
+    this.activeComponent = ActiveComponent.CAESAR_SHIFTER;
     (this.$refs["caesar-shifter"] as CaesarShifterComponent).update();
+  }
+
+  private substitution() {
+    this.activeComponent = ActiveComponent.CIPHER_SOLVER;
+    (this.$refs["cipher-solver"] as CipherSolverComponent).update();
   }
 }
 </script>

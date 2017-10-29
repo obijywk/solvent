@@ -69,15 +69,15 @@ export function solve(ciphertext: string, numIterations: number): Promise<Result
       if (i === numIterations) {
         resolve(resultSet.results);
       } else {
-        process.nextTick(runIteration);
+        setImmediate(runIteration);
       }
     }
-    process.nextTick(runIteration);
+    setImmediate(runIteration);
   });
 }
 
 function randomlyAdjustKey(key: string): string {
-  for (let i = 0; i < _.random(1, 13); i++) {
+  for (let i = 0; i < _.random(3, 13); i++) {
     const aIndex = _.random(0, 24);
     const bIndex = _.random(aIndex + 1, 25);
     key = swapKey(key, aIndex, bIndex);
