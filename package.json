@@ -30,7 +30,7 @@
     "webpack": "^3.8.1"
   },
   "scripts": {
-    "build-and-run-server": "npm run build-server && npm run run-server",
+    "build-and-run": "npm run build-client && npm run build-server && npm run run-server",
     "build-client": "webpack",
     "build-server": "tsc",
     "check-all": "npm run build-client && npm run build-server && npm run lint-server && npm run test",
