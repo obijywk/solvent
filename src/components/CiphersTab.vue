@@ -12,6 +12,12 @@
     </div>
 
     <div id="ciphers-tab-buttons">
+      <v-tooltip top>
+        <v-btn slot="activator" fab small color="error" @click="clear">
+          <v-icon>delete_forever</v-icon>
+        </v-btn>
+        <span>Clear text</span>
+      </v-tooltip>
       <v-btn @click="caesarShift()">
         Caesar Shift
       </v-btn>
@@ -48,6 +54,7 @@
   flex: none;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
 }
 #ciphers-tab-outputs {
   height: 100%;
@@ -83,6 +90,10 @@ export default class CiphersTab extends Vue {
 
   private ActiveComponent = ActiveComponent;
   private activeComponent: ActiveComponent = ActiveComponent.CAESAR_SHIFTER;
+
+  private clear() {
+    this.text = "";
+  }
 
   private caesarShift() {
     this.activeComponent = ActiveComponent.CAESAR_SHIFTER;
