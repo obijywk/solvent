@@ -6,8 +6,14 @@
     </p>
 
     <div id="codes-tab-text-container">
-      <v-text-field id="codes-tab-text" label="Text" textarea rows="3" v-model="text">
-      </v-text-field>
+      <v-text-field
+        id="codes-tab-text"
+        label="Text"
+        textarea
+        rows="3"
+        hide-details
+        v-model="text"
+      />
     </div>
 
     <div id="codes-tab-buttons">
