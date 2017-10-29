@@ -1,17 +1,9 @@
 import * as express from "express";
 
-export class Error {
-  public status: string;
-  public title: string;
-  public detail: string;
-}
-
-export class ErrorResponse {
-  public errors: Error[];
-}
+import { ErrorResponse } from "../../api/error_response";
 
 export function badRequest(res: express.Response, detail: string) {
-  res.status(400).send({
+  const errorResponse: ErrorResponse = {
     errors: [
       {
         detail,
@@ -19,11 +11,12 @@ export function badRequest(res: express.Response, detail: string) {
         title: "Bad Request",
       },
     ],
-  });
+  };
+  res.status(400).send(errorResponse);
 }
 
 export function internalServerError(res: express.Response, detail: string) {
-  res.status(500).send({
+  const errorResponse: ErrorResponse = {
     errors: [
       {
         detail,
@@ -31,5 +24,6 @@ export function internalServerError(res: express.Response, detail: string) {
         title: "Internal Server Error",
       },
     ],
-  });
+  };
+  res.status(500).send(errorResponse);
 }

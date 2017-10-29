@@ -35,7 +35,7 @@
     "build-server": "tsc",
     "check-all": "npm run build-client && npm run build-server && npm run lint-server && npm run test",
     "lint-server": "tslint -c tslint.json 'src/server/**/*.ts'",
-    "run-server": "DEBUG=solvent nodejs built/server.js",
+    "run-server": "DEBUG=solvent nodejs built/server/server.js",
     "test": "mocha --reporter spec --require ts-node/register 'src/**/*.test.ts'"
   },
   "dependencies": {

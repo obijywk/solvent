@@ -4,9 +4,9 @@ import * as http from "http";
 
 import * as quadgramStats from "./lib/quadgram_stats";
 
-import { internalServerError } from "./rpc/error_response";
+import { internalServerError } from "./api/error_response";
 
-import * as scoreEnglish from "./rpc/score_english";
+import * as scoreEnglish from "./api/score_english";
 
 const debug = debugCreator("solvent");
 
