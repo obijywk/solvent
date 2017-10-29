@@ -1,6 +1,6 @@
 import { Express } from "express";
 
-import * as quadgramStats from "../lib/quadgram_stats";
+import * as fitnessStats from "../lib/fitness_stats";
 
 import { badRequest } from "./error_response";
 
@@ -16,7 +16,7 @@ export function install(app: Express) {
     }
 
     const scoreEnglishResponse = new ScoreEnglishResponse();
-    scoreEnglishResponse.scores = scoreEnglishRequest.texts.map(quadgramStats.score);
+    scoreEnglishResponse.scores = scoreEnglishRequest.texts.map(fitnessStats.quadgramScore);
     res.send(scoreEnglishResponse);
   });
 }

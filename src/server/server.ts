@@ -2,7 +2,7 @@ import * as debugCreator from "debug";
 import * as express from "express";
 import * as http from "http";
 
-import * as quadgramStats from "./lib/quadgram_stats";
+import * as fitnessStats from "./lib/fitness_stats";
 
 import { internalServerError } from "./api/error_response";
 
@@ -24,7 +24,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 Promise.all([
-  quadgramStats.initialized,
+  fitnessStats.initialized,
 ]).then(() => {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {
