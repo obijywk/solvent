@@ -6,7 +6,7 @@ export class Result {
   constructor(
     public key: string,
     public plaintext: string,
-    public score: number) {}
+    public score: number) { }
 }
 
 const MAX_RESULTS = 10;
@@ -29,43 +29,51 @@ class ResultSet {
   }
 }
 
-export function solve(ciphertext: string, numIterations: number): Result[] {
-  const strippedCiphertext = ciphertext.toUpperCase().replace(/[^A-Z ]/g, "");
-  const initialKey: string = _.join(_.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
-  const initialPlaintext: string = decipher(strippedCiphertext, initialKey);
+export function solve(ciphertext: string, numIterations: number): Promise<Result[]> {
+  return new Promise((resolve, reject) => {
+    const strippedCiphertext = ciphertext.toUpperCase().replace(/[^A-Z ]/g, "");
+    const initialKey: string = _.join(_.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
+    const initialPlaintext: string = decipher(strippedCiphertext, initialKey);
 
-  let lastResult = new Result(
-    initialKey,
-    initialPlaintext,
-    scorePlaintext(initialPlaintext));
+    let lastResult = new Result(
+      initialKey,
+      initialPlaintext,
+      scorePlaintext(initialPlaintext));
 
-  const resultSet = new ResultSet();
-  resultSet.add(lastResult);
+    const resultSet = new ResultSet();
+    resultSet.add(lastResult);
 
-  for (let i = 0; i < numIterations; i++) {
-    const result = _.clone(lastResult);
-    for (let aIndex = 0; aIndex < initialKey.length - 1; aIndex++) {
-      for (let bIndex = aIndex + 1; bIndex < initialKey.length; bIndex++) {
-        const key = swapKey(lastResult.key, aIndex, bIndex);
-        const plaintext = decipher(strippedCiphertext, key);
-        const score = scorePlaintext(plaintext);
-        if (score > result.score) {
-          result.key = key;
-          result.plaintext = plaintext;
-          result.score = score;
+    let i = 0;
+    function runIteration() {
+      const result = _.clone(lastResult);
+      for (let aIndex = 0; aIndex < initialKey.length - 1; aIndex++) {
+        for (let bIndex = aIndex + 1; bIndex < initialKey.length; bIndex++) {
+          const key = swapKey(lastResult.key, aIndex, bIndex);
+          const plaintext = decipher(strippedCiphertext, key);
+          const score = scorePlaintext(plaintext);
+          if (score > result.score) {
+            result.key = key;
+            result.plaintext = plaintext;
+            result.score = score;
+          }
         }
       }
+      if (result.score === lastResult.score) {
+        result.key = randomlyAdjustKey(result.key);
+        result.plaintext = decipher(strippedCiphertext, result.key);
+        result.score = scorePlaintext(result.plaintext);
+      }
+      resultSet.add(result);
+      lastResult = result;
+      i++;
+      if (i === numIterations) {
+        resolve(resultSet.results);
+      } else {
+        process.nextTick(runIteration);
+      }
     }
-    if (result.score === lastResult.score) {
-      result.key = randomlyAdjustKey(result.key);
-      result.plaintext = decipher(strippedCiphertext, result.key);
-      result.score = scorePlaintext(result.plaintext);
-    }
-    resultSet.add(result);
-    lastResult = result;
-  }
-
-  return resultSet.results;
+    process.nextTick(runIteration);
+  });
 }
 
 function randomlyAdjustKey(key: string): string {
