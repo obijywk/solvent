@@ -24,7 +24,7 @@ class ResultSet {
       0,
       result);
     if (this.results.length > MAX_RESULTS) {
-      this.results.splice(10, 1);
+      this.results.splice(MAX_RESULTS, 1);
     }
   }
 }

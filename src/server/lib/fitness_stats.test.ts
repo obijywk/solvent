@@ -3,6 +3,8 @@ import "mocha";
 
 import * as fitnessStats from "./fitness_stats";
 
+/* tslint:disable:no-unused-expression */
+
 describe("fitness_stats", () => {
   before(() => fitnessStats.initialized);
 
@@ -17,6 +19,15 @@ describe("fitness_stats", () => {
       const unstrippedScore = fitnessStats.quadgramScore("aB!cD@ eF#");
       const strippedScore = fitnessStats.quadgramScore("ABCDEF");
       expect(unstrippedScore).to.equal(strippedScore);
+    });
+  });
+
+  describe("isWord function", () => {
+    it("returns true for a word", () => {
+      expect(fitnessStats.isWord("test")).to.be.true;
+    });
+    it("returns false for a non-word", () => {
+      expect(fitnessStats.isWord("zxcvbnm")).to.be.false;
     });
   });
 

@@ -73,6 +73,11 @@ export function quadgramScore(text: string): number {
   return textScore;
 }
 
+export function isWord(inputWord: string): boolean {
+  const word = inputWord.toUpperCase();
+  return wordLogProbs[word] !== undefined;
+}
+
 export function wordScore(text: string): number {
   const strippedText = text.toUpperCase().replace(/[^A-Z ]/g, "");
   const words = strippedText.split(" ");
