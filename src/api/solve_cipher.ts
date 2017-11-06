@@ -6,7 +6,7 @@ export class SolveCipherRequest {
 export class SolveCipherResult {
   public key: string;
   public plaintext: string;
-  public score: number;
+  public cost: number;
 }
 
 export class SolveCipherResponse {

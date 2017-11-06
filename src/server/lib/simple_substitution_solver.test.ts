@@ -28,20 +28,44 @@ describe("simple_substitution_solver", () => {
     });
   });
 
-  describe("solve function", () => {
-    it("returns sane results", (done) => {
+  describe("solve", () => {
+    it("returns sane results", () => {
+      const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({
+        maxResults: 10,
+        numIterations: 20,
+      });
       const ciphertext = "AB CDEFE BG CHCEI FHA JE GBKLEL MBIE NOHA PEQEA NDMEP";
-      simpleSubstitutionSolver.solve(ciphertext, 20).then((results) => {
-        expect(results.length).to.be.at.most(rewiredSimpleSubstitutionSolver.__get__("MAX_RESULTS"));
+      return solver.solve(ciphertext).then((results) => {
+        expect(results.length).to.be.at.most(10);
         for (const result of results) {
           expect(result.key).to.have.length(26);
           expect(result.plaintext).to.have.length(ciphertext.length);
           expect(result.plaintext.indexOf(" ")).to.equal(ciphertext.indexOf(" "));
         }
         for (let i = 0; i < results.length - 1; i++) {
-          expect(results[i].score).to.be.greaterThan(results[i + 1].score);
+          expect(results[i].cost).to.be.lessThan(results[i + 1].cost);
         }
-        done();
+      });
+    });
+  });
+
+  describe("solve with simulated annealing", () => {
+    it("returns sane results", () => {
+      const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({
+        maxResults: 10,
+        numIterations: 100,
+      });
+      const ciphertext = "AB CDEFE BG CHCEI FHA JE GBKLEL MBIE NOHA PEQEA NDMEP";
+      return solver.solveWithSimulatedAnnealing(ciphertext).then((results) => {
+        expect(results.length).to.be.at.most(10);
+        for (const result of results) {
+          expect(result.key).to.have.length(26);
+          expect(result.plaintext).to.have.length(ciphertext.length);
+          expect(result.plaintext.indexOf(" ")).to.equal(ciphertext.indexOf(" "));
+        }
+        for (let i = 0; i < results.length - 1; i++) {
+          expect(results[i].cost).to.be.lessThan(results[i + 1].cost);
+        }
       });
     });
   });

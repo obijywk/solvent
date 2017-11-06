@@ -1,88 +1,131 @@
 import * as _ from "lodash";
 
 import * as fitnessStats from "./fitness_stats";
+import { HillClimbingSolver } from "./hill_climbing_solver";
+import { SimulatedAnnealer } from "./simulated_annealer";
 
 export class Result {
   constructor(
     public key: string,
     public plaintext: string,
-    public score: number) { }
+    public cost: number) { }
 }
 
-const MAX_RESULTS = 10;
+interface ISimpleSubstitutionSolverOptions {
+  maxResults: number;
+  numIterations: number;
+  lodash: any;
+}
 
-class ResultSet {
-  public results: Result[] = [];
+export class SimpleSubstitutionSolver {
+  private options: ISimpleSubstitutionSolverOptions;
+  private lodash = _;
 
-  public add(result: Result) {
-    const insertionIndex = _.sortedIndexBy(this.results, result, (r) => -r.score);
-    if (insertionIndex < this.results.length && this.results[insertionIndex].plaintext === result.plaintext) {
-      return;
-    }
-    this.results.splice(
-      insertionIndex,
-      0,
-      result);
-    if (this.results.length > MAX_RESULTS) {
-      this.results.splice(MAX_RESULTS, 1);
+  private hasSpaces: boolean = true;
+
+  constructor(
+      options: Partial<ISimpleSubstitutionSolverOptions> = {}) {
+    this.options = {
+      lodash: _,
+      maxResults: 10,
+      numIterations: 2000,
+      ...options,
+    };
+    if (this.options.lodash) {
+      this.lodash = this.options.lodash;
     }
   }
-}
 
-export function solve(ciphertext: string, numIterations: number): Promise<Result[]> {
-  return new Promise((resolve, reject) => {
-    const strippedCiphertext = ciphertext.toUpperCase().replace(/[^A-Z ]/g, "");
-    const initialKey: string = _.join(_.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
-    const initialPlaintext: string = decipher(strippedCiphertext, initialKey);
+  public solve(unstrippedCiphertext: string): Promise<Result[]> {
+    const ciphertext = unstrippedCiphertext.toUpperCase().replace(/[^A-Z ]/g, "");
+    this.hasSpaces = ciphertext.indexOf(" ") !== -1;
 
-    let lastResult = new Result(
-      initialKey,
-      initialPlaintext,
-      scorePlaintext(initialPlaintext));
+    const initialKey: string = _.join(this.lodash.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
 
-    const resultSet = new ResultSet();
-    resultSet.add(lastResult);
+    const costFunction = (key: string) => {
+      const plaintext = decipher(ciphertext, key);
+      return this.computeCost(plaintext);
+    };
 
-    let i = 0;
-    function runIteration() {
-      const result = _.clone(lastResult);
-      for (let aIndex = 0; aIndex < initialKey.length - 1; aIndex++) {
-        for (let bIndex = aIndex + 1; bIndex < initialKey.length; bIndex++) {
-          const key = swapKey(lastResult.key, aIndex, bIndex);
-          const plaintext = decipher(strippedCiphertext, key);
-          const score = scorePlaintext(plaintext);
-          if (score > result.score) {
-            result.key = key;
-            result.plaintext = plaintext;
-            result.score = score;
-          }
+    const neighborsFunction = (key: string) => {
+      const neighbors: string[] = [];
+      for (let aIndex = 0; aIndex < key.length - 1; aIndex++) {
+        for (let bIndex = aIndex + 1; bIndex < key.length; bIndex++) {
+          neighbors.push(swapKey(key, aIndex, bIndex));
         }
       }
-      if (result.score === lastResult.score) {
-        result.key = randomlyAdjustKey(result.key);
-        result.plaintext = decipher(strippedCiphertext, result.key);
-        result.score = scorePlaintext(result.plaintext);
-      }
-      resultSet.add(result);
-      lastResult = result;
-      i++;
-      if (i === numIterations) {
-        resolve(resultSet.results);
-      } else {
-        setImmediate(runIteration);
-      }
-    }
-    setImmediate(runIteration);
-  });
-}
+      return neighbors;
+    };
 
-function randomlyAdjustKey(key: string): string {
-  for (let i = 0; i < _.random(3, 13); i++) {
-    const aIndex = _.random(0, 24);
-    const bIndex = _.random(aIndex + 1, 25);
-    key = swapKey(key, aIndex, bIndex);
+    const solver = new HillClimbingSolver(
+      initialKey,
+      costFunction,
+      neighborsFunction,
+      (key) => this.randomlyJumpKey(key),
+      {
+        equivalenceKeyFunction: (key) => decipher(ciphertext, key),
+        iterations: this.options.numIterations,
+        maxResults: this.options.maxResults,
+      },
+    );
+
+    return solver.run().then((results) => {
+      return results.map((result) => new Result(
+        result.solution,
+        decipher(ciphertext, result.solution),
+        result.cost));
+    });
   }
-  return key;
+
+  public solveWithSimulatedAnnealing(unstrippedCiphertext: string): Promise<Result[]> {
+    const ciphertext = unstrippedCiphertext.toUpperCase().replace(/[^A-Z ]/g, "");
+    this.hasSpaces = ciphertext.indexOf(" ") !== -1;
+
+    const initialKey: string = _.join(this.lodash.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
+
+    const costFunction = (key: string) => {
+      const plaintext = decipher(ciphertext, key);
+      return this.computeCost(plaintext);
+    };
+
+    const simulatedAnnealer = new SimulatedAnnealer(
+      initialKey,
+      costFunction,
+      (key) => this.randomlyJumpKey(key),
+      {
+        alpha: 0.9,
+        iterationsPerTemperature: this.options.numIterations / 100,
+        minTemperature: 0.00001,
+      });
+
+    return simulatedAnnealer.run().then((results) => {
+      return results.map((result) => new Result(
+        result.solution,
+        decipher(ciphertext, result.solution),
+        result.cost));
+    });
+  }
+
+  private randomlyJumpKey(key: string): string {
+    for (let i = 0; i < this.lodash.random(3, 13); i++) {
+      key = this.randomlySwapKey(key);
+    }
+    return key;
+  }
+
+  private randomlySwapKey(key: string): string {
+    const aIndex = this.lodash.random(0, 24);
+    const bIndex = this.lodash.random(aIndex + 1, 25);
+    return swapKey(key, aIndex, bIndex);
+  }
+
+  private computeCost(text: string) {
+    if (this.hasSpaces) {
+      return -(fitnessStats.wordScore(text) + fitnessStats.quadgramScore(text));
+    } else {
+      return -fitnessStats.quadgramScore(text);
+    }
+  }
 }
 
 function swapKey(key: string, aIndex: number, bIndex: number): string {
@@ -105,12 +148,4 @@ function decipher(ciphertext: string, key: string) {
     output += key[charCode - 65];
   }
   return output;
-}
-
-function scorePlaintext(plaintext: string) {
-  if (plaintext.indexOf(" ") !== -1) {
-    return fitnessStats.wordScore(plaintext) + fitnessStats.quadgramScore(plaintext);
-  } else {
-    return fitnessStats.quadgramScore(plaintext);
-  }
 }

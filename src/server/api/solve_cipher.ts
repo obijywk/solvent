@@ -24,8 +24,12 @@ export function install(app: Express) {
       solveCipherRequest.iterations = 2000;
     }
 
-    simpleSubstitutionSolver
-      .solve(solveCipherRequest.ciphertext, solveCipherRequest.iterations)
+    const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({
+      numIterations: solveCipherRequest.iterations,
+    });
+
+    solver
+      .solve(solveCipherRequest.ciphertext)
       .then((results) => {
         const solveCipherResponse = new SolveCipherResponse();
         solveCipherResponse.results = [];

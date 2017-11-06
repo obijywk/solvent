@@ -10,7 +10,7 @@
       v-if="!solving"
     >
       <template slot="items" slot-scope="props">
-        <td>{{ props.item.score }}</td>
+        <td>{{ props.item.cost }}</td>
         <td>{{ props.item.plaintext }}</td>
         <td>{{ props.item.key }}</td>
       </template>
@@ -43,7 +43,7 @@ export default class CipherSolver extends Vue {
   private results: SolveCipherResult[] = [];
 
   private headers = [
-    { text: "Score", value: "score", align: "left", sortable: false },
+    { text: "Cost", value: "cost", align: "left", sortable: false },
     { text: "Plaintext", value: "plaintext", align: "left", sortable: false },
     { text: "Key", value: "key", align: "left", sortable: false },
   ];
