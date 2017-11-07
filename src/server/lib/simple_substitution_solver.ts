@@ -21,8 +21,6 @@ export class SimpleSubstitutionSolver {
   private options: ISimpleSubstitutionSolverOptions;
   private lodash = _;
 
-  private hasSpaces: boolean = true;
-
   constructor(
       options: Partial<ISimpleSubstitutionSolverOptions> = {}) {
     this.options = {
@@ -38,14 +36,22 @@ export class SimpleSubstitutionSolver {
 
   public solve(unstrippedCiphertext: string): Promise<Result[]> {
     const ciphertext = unstrippedCiphertext.toUpperCase().replace(/[^A-Z ]/g, "");
-    this.hasSpaces = ciphertext.indexOf(" ") !== -1;
+    const hasSpaces = ciphertext.indexOf(" ") !== -1;
 
     const initialKey: string = _.join(this.lodash.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
 
-    const costFunction = (key: string) => {
-      const plaintext = decipher(ciphertext, key);
-      return this.computeCost(plaintext);
-    };
+    let costFunction;
+    if (hasSpaces) {
+      costFunction = (key: string) => {
+        const plaintext = decipher(ciphertext, key);
+        return -(fitnessStats.wordScore(plaintext) + fitnessStats.quadgramScore(plaintext));
+      };
+    } else {
+      costFunction = (key: string) => {
+        const plaintext = decipher(ciphertext, key);
+        return -fitnessStats.quadgramScore(plaintext);
+      };
+    }
 
     const neighborsFunction = (key: string) => {
       const neighbors: string[] = [];
@@ -79,13 +85,12 @@ export class SimpleSubstitutionSolver {
 
   public solveWithSimulatedAnnealing(unstrippedCiphertext: string): Promise<Result[]> {
     const ciphertext = unstrippedCiphertext.toUpperCase().replace(/[^A-Z ]/g, "");
-    this.hasSpaces = ciphertext.indexOf(" ") !== -1;
 
     const initialKey: string = _.join(this.lodash.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
 
     const costFunction = (key: string) => {
       const plaintext = decipher(ciphertext, key);
-      return this.computeCost(plaintext);
+      return -(fitnessStats.wordScore(plaintext) + fitnessStats.quadgramScore(plaintext));
     };
 
     const simulatedAnnealer = new SimulatedAnnealer(
@@ -117,14 +122,6 @@ export class SimpleSubstitutionSolver {
     const aIndex = this.lodash.random(0, 24);
     const bIndex = this.lodash.random(aIndex + 1, 25);
     return swapKey(key, aIndex, bIndex);
-  }
-
-  private computeCost(text: string) {
-    if (this.hasSpaces) {
-      return -(fitnessStats.wordScore(text) + fitnessStats.quadgramScore(text));
-    } else {
-      return -fitnessStats.quadgramScore(text);
-    }
   }
 }
 

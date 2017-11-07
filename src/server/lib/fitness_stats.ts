@@ -3,6 +3,7 @@ import * as readline from "readline";
 import * as zlib from "zlib";
 
 const quadgramLogProbs: { [key: string]: number } = {};
+const quadgramLogProbTrie: number[][][][] = [];
 let quadgramFloorLogProb: number;
 
 const wordLogProbs: { [key: string]: number } = {};
@@ -27,6 +28,32 @@ function loadData(): Promise<void> {
         quadgramLogProbs[quadgramFrequency.quadgram] = Math.log(quadgramFrequency.frequency / n);
       }
       quadgramFloorLogProb = Math.log(0.01 / n);
+
+      for (let a = 0; a < 26; a++) {
+        const l1: number[][][] = [];
+        for (let b = 0; b < 26; b++) {
+          const l2: number[][] = [];
+          for (let c = 0; c < 26; c++) {
+            const l3: number[] = [];
+            for (let d = 0; d < 26; d++) {
+              const quadgram =
+                String.fromCharCode(a + 65) +
+                String.fromCharCode(b + 65) +
+                String.fromCharCode(c + 65) +
+                String.fromCharCode(d + 65);
+              let logProb = quadgramLogProbs[quadgram];
+              if (logProb === undefined) {
+                logProb = quadgramFloorLogProb;
+              }
+              l3.push(logProb);
+            }
+            l2.push(l3);
+          }
+          l1.push(l2);
+        }
+        quadgramLogProbTrie.push(l1);
+      }
+
       resolve();
     });
   });
@@ -62,13 +89,11 @@ export function quadgramScore(text: string): number {
   const strippedText = text.toUpperCase().replace(/[^A-Z]/g, "");
   let textScore: number = 0;
   for (let i = 0; i <= strippedText.length - 4; i++) {
-    const quadgram = strippedText.substring(i, i + 4);
-    const quadgramLogProb = quadgramLogProbs[quadgram];
-    if (quadgramLogProb !== undefined) {
-      textScore += quadgramLogProb;
-    } else {
-      textScore += quadgramFloorLogProb;
-    }
+    const l1 = quadgramLogProbTrie[strippedText.charCodeAt(i) - 65];
+    const l2 = l1[strippedText.charCodeAt(i + 1) - 65];
+    const l3 = l2[strippedText.charCodeAt(i + 2) - 65];
+    const quadgramLogProb = l3[strippedText.charCodeAt(i + 3) - 65];
+    textScore += quadgramLogProb;
   }
   return textScore;
 }
