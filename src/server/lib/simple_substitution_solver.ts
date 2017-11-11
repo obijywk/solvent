@@ -44,7 +44,7 @@ export class SimpleSubstitutionSolver {
     if (hasSpaces) {
       costFunction = (key: string) => {
         const plaintext = decipher(ciphertext, key);
-        return -(fitnessStats.wordScore(plaintext) + fitnessStats.quadgramScore(plaintext));
+        return -(fitnessStats.wordScoreClean(plaintext) + fitnessStats.quadgramScore(plaintext));
       };
     } else {
       costFunction = (key: string) => {

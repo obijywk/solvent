@@ -104,8 +104,11 @@ export function isWord(inputWord: string): boolean {
 }
 
 export function wordScore(text: string): number {
-  const strippedText = text.toUpperCase().replace(/[^A-Z ]/g, "");
-  const words = strippedText.split(" ");
+  return wordScoreClean(text.toUpperCase().replace(/[^A-Z ]/g, ""));
+}
+
+export function wordScoreClean(text: string): number {
+  const words = text.split(" ");
   let textScore: number = 0;
   for (const word of words) {
     if (word.length === 0) {
