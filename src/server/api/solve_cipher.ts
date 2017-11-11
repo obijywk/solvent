@@ -21,7 +21,7 @@ export function install(app: Express) {
     }
 
     if (!solveCipherRequest.iterations) {
-      solveCipherRequest.iterations = 2000;
+      solveCipherRequest.iterations = 1500;
     }
 
     const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({

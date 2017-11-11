@@ -108,6 +108,9 @@ export function wordScore(text: string): number {
   const words = strippedText.split(" ");
   let textScore: number = 0;
   for (const word of words) {
+    if (word.length === 0) {
+      continue;
+    }
     const wordLogProb = wordLogProbs[word];
     if (wordLogProb !== undefined) {
       textScore += wordLogProb;

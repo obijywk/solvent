@@ -26,7 +26,7 @@ export class SimpleSubstitutionSolver {
     this.options = {
       lodash: _,
       maxResults: 10,
-      numIterations: 2000,
+      numIterations: 1500,
       ...options,
     };
     if (this.options.lodash) {
@@ -35,7 +35,7 @@ export class SimpleSubstitutionSolver {
   }
 
   public solve(unstrippedCiphertext: string): Promise<Result[]> {
-    const ciphertext = unstrippedCiphertext.toUpperCase().replace(/[^A-Z ]/g, "");
+    const ciphertext = unstrippedCiphertext.toUpperCase().replace(/\n/g, " ").replace(/[^A-Z ]/g, "");
     const hasSpaces = ciphertext.indexOf(" ") !== -1;
 
     const initialKey: string = _.join(this.lodash.shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), "");
@@ -112,7 +112,7 @@ export class SimpleSubstitutionSolver {
   }
 
   private randomlyJumpKey(key: string): string {
-    for (let i = 0; i < this.lodash.random(3, 13); i++) {
+    for (let i = 0; i < this.lodash.random(12, 14); i++) {
       key = this.randomlySwapKey(key);
     }
     return key;

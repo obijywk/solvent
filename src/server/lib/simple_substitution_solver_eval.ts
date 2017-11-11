@@ -45,26 +45,29 @@ function computeErrorRatio(a: string, b: string): number {
 }
 
 fitnessStats.initialized.then(async () => {
+  const NUM_REPS = 3;
   let errorRatioSum = 0;
   let elapsedTimeSum = 0;
-  for (const plaintext of PLAINTEXTS) {
-    process.stdout.write(".");
-    const ciphertext = encrypt(plaintext);
-    const startTime = Date.now();
-    const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({
-      lodash,
-      numIterations: 1000,
-    });
-    const results = await solver.solve(ciphertext);
-    const endTime = Date.now();
-    const errorRatio = computeErrorRatio(plaintext, results[0].plaintext);
-    if (errorRatio > 0) {
-      process.stdout.write(`${errorRatio} ${results[0].plaintext}\n`);
+  for (let reps = 0; reps < NUM_REPS; reps++) {
+    for (const plaintext of PLAINTEXTS) {
+      process.stdout.write(".");
+      const ciphertext = encrypt(plaintext);
+      const startTime = Date.now();
+      const solver = new simpleSubstitutionSolver.SimpleSubstitutionSolver({
+        lodash,
+        numIterations: 1500,
+      });
+      const results = await solver.solve(ciphertext);
+      const endTime = Date.now();
+      const errorRatio = computeErrorRatio(plaintext, results[0].plaintext);
+      if (errorRatio > 0) {
+        process.stdout.write(`${errorRatio} ${results[0].plaintext}\n`);
+      }
+      errorRatioSum += errorRatio;
+      elapsedTimeSum += endTime - startTime;
     }
-    errorRatioSum += errorRatio;
-    elapsedTimeSum += endTime - startTime;
   }
   process.stdout.write("\n");
-  process.stdout.write(`Average error ratio: ${errorRatioSum / PLAINTEXTS.length}\n`);
-  process.stdout.write(`Average solve time: ${elapsedTimeSum / PLAINTEXTS.length / 1000}s\n`);
+  process.stdout.write(`Average error ratio: ${errorRatioSum / (PLAINTEXTS.length * NUM_REPS)}\n`);
+  process.stdout.write(`Average solve time: ${elapsedTimeSum / (PLAINTEXTS.length * NUM_REPS) / 1000}s\n`);
 });
