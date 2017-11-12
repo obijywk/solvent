@@ -20,7 +20,7 @@ class Letter {
 class Word {
   constructor(
     public letters: Letter[] = [],
-    public cost: number | null = null) {
+    public cost: number = 0) {
   }
 }
 
@@ -48,18 +48,28 @@ export function unweave(text: string): Promise<Result[]> {
       (letter) => new Word([letter], -fitnessStats.wordScore(letter.letter)));
     const solver = new SolutionCostSolver<Word[]>(
       initialSolution,
-      (words) => _.sumBy(words, "cost"));
+      (words) => _.sumBy(words, "cost"),
+      { maxResults: 3 });
 
-    const stepQueue: Step[] = [new Step(new Word(), fitnessStats.wordLogProbsTrie, initialLetters, 0, [])];
+    const wordStepQueue: Step[] = [new Step(new Word(), fitnessStats.wordLogProbsTrie, initialLetters, 0, [])];
+    const prefixStepQueue: Step[] = [];
     function runStep() {
-      if (stepQueue.length === 0) {
+      let step: Step;
+      if (wordStepQueue.length === 0 && prefixStepQueue.length === 0) {
         resolve(solver.getResults().map((result) => new Result(
           result.solution.map(wordString),
           result.cost)));
         return;
+      } else if (wordStepQueue.length > 0 && wordStepQueue[wordStepQueue.length - 1].letters.length === 0) {
+        step = wordStepQueue.pop() as Step;
+      } else if (prefixStepQueue.length > 0) {
+        step = prefixStepQueue.pop() as Step;
+      } else if (wordStepQueue.length > 0) {
+        step = wordStepQueue.pop() as Step;
+      } else {
+        // Should be unreachable.
+        return;
       }
-
-      const step = stepQueue.pop() as Step;
 
       const wordsCost = _.sumBy(step.words, "cost");
       const results = solver.getResults();
@@ -89,10 +99,20 @@ export function unweave(text: string): Promise<Result[]> {
             word.cost = -childNode.value;
             const nextWords = step.words.concat([word]);
             const nextWordStep = new Step(new Word(), fitnessStats.wordLogProbsTrie, nextLetters, 0, nextWords);
-            stepQueue.push(nextWordStep);
+            const nextWordStepIndex = _.sortedLastIndexBy(
+              wordStepQueue,
+              nextWordStep,
+              (s) => {
+                let score = -s.letters.length;
+                for (const sWord of s.words) {
+                  score += (1 / sWord.cost);
+                }
+                return score;
+              });
+            wordStepQueue.splice(nextWordStepIndex, 0, nextWordStep);
           }
           const nextStep = new Step(word, childNode, nextLetters, lettersIndex, step.words);
-          stepQueue.push(nextStep);
+          prefixStepQueue.push(nextStep);
         }
       }
 
