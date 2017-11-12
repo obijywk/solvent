@@ -16,11 +16,11 @@ export class Result<S> {
   }
 }
 
-export abstract class SolutionCostSolver<S> {
+export class SolutionCostSolver<S> {
   protected options: ISolutionCostSolverOptions<S>;
   protected results: Array<Result<S>> = [];
 
-  protected constructor(
+  public constructor(
       protected initialSolution: S,
       protected costFunction: CostFunction<S>,
       options: Partial<ISolutionCostSolverOptions<S>> = {}) {
@@ -31,9 +31,7 @@ export abstract class SolutionCostSolver<S> {
     this.addResult(initialSolution, this.costFunction(initialSolution));
   }
 
-  public abstract run(): Promise<Array<Result<S>>>;
-
-  protected addResult(solution: S, cost: number): boolean {
+  public addResult(solution: S, cost: number = this.costFunction(solution)): boolean {
     const result = new Result(
       solution,
       cost,
@@ -66,7 +64,7 @@ export abstract class SolutionCostSolver<S> {
     return true;
   }
 
-  protected getResults(): Array<Result<S>> {
+  public getResults(): Array<Result<S>> {
     return this.results;
   }
 }

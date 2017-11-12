@@ -2,11 +2,14 @@ import * as fs from "fs";
 import * as readline from "readline";
 import * as zlib from "zlib";
 
+import { ValueTrieNode } from "./value_trie";
+
 const quadgramLogProbs: { [key: string]: number } = {};
 const quadgramLogProbTrie: number[][][][] = [];
 let quadgramFloorLogProb: number;
 
 const wordLogProbs: { [key: string]: number } = {};
+export const wordLogProbsTrie: ValueTrieNode<number> = new ValueTrieNode();
 let wordFloorLogProb: number;
 
 function loadData(): Promise<void> {
@@ -73,7 +76,9 @@ function loadData(): Promise<void> {
 
     lineReader.on("close", () => {
       for (const wordFrequency of wordFrequencies) {
-        wordLogProbs[wordFrequency.word] = Math.log(wordFrequency.frequency / n);
+        const logProb = Math.log(wordFrequency.frequency / n);
+        wordLogProbs[wordFrequency.word] = logProb;
+        wordLogProbsTrie.insert(wordFrequency.word, logProb);
       }
       wordFloorLogProb = Math.log(0.01 / n);
       resolve();
@@ -114,6 +119,19 @@ export function wordScoreClean(text: string): number {
     if (word.length === 0) {
       continue;
     }
+    const wordLogProb = wordLogProbs[word];
+    if (wordLogProb !== undefined) {
+      textScore += wordLogProb;
+    } else {
+      textScore += wordFloorLogProb;
+    }
+  }
+  return textScore;
+}
+
+export function wordListScore(words: string[]): number {
+  let textScore: number = 0;
+  for (const word of words) {
     const wordLogProb = wordLogProbs[word];
     if (wordLogProb !== undefined) {
       textScore += wordLogProb;
