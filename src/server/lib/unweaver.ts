@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import * as fitnessStats from "./fitness_stats";
 import { SolutionCostSolver } from "./solution_cost_solver";
 import { ValueTrieNode } from "./value_trie";
+import { setImmediate } from "timers";
 
 export class Result {
   constructor(
@@ -38,7 +39,7 @@ class Step {
   }
 }
 
-export function unweave(text: string): Promise<Result[]> {
+export function unweave(text: string, numWords: number | null = null): Promise<Result[]> {
   return new Promise((resolve) => {
     const initialLetters = [];
     for (let i = 0; i < text.length; i++) {
@@ -81,8 +82,15 @@ export function unweave(text: string): Promise<Result[]> {
       let lettersIndexLimit = step.letters.length;
       if (step.prefix.letters.length === 0) {
         if (step.letters.length === 0) {
+          if (numWords !== null && step.words.length !== numWords) {
+            setImmediate(runStep);
+            return;
+          }
           const solution = _.sortBy(step.words, (word) => word.letters[0].position);
           solver.addResult(solution);
+        } else if (numWords !== null && step.words.length >= numWords) {
+          setImmediate(runStep);
+          return;
         } else {
           lettersIndexLimit = step.lettersStart + 1;
         }

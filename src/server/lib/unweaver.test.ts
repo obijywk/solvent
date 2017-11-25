@@ -14,5 +14,11 @@ describe("unweaver", () => {
         expect(results[0].words).to.eql(["ONE", "TWO"]);
       });
     });
+    it("correctly unweaves with word count constraint", () => {
+      const weavedText = "OTNWTHOREEE";
+      return unweaver.unweave(weavedText, 4).then((results) => {
+        expect(results[0].words).to.eql(["ON", "THREE", "WE", "TO"]);
+      });
+    });
   });
 });
