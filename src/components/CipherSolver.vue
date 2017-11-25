@@ -8,6 +8,7 @@
       :items="results"
       hide-actions
       v-if="!solving"
+      id="cipher-solver-table"
     >
       <template slot="items" slot-scope="props">
         <td>{{ props.item.cost }}</td>
@@ -25,6 +26,9 @@
 }
 #cipher-solver-progress {
   margin-top: 32px;
+}
+#cipher-solver-table {
+  overflow-y: auto;
 }
 </style>
 

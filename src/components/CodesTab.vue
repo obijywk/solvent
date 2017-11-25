@@ -101,7 +101,6 @@
 }
 #codes-tab-pickers {
   margin-top: auto;
-  margin-bottom: 48px;
 }
 #codes-tab-picker-cards > .card {
   margin: 16px;

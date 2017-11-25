@@ -59,7 +59,6 @@
 #ciphers-tab-outputs {
   height: 100%;
   overflow: hidden;
-  margin-bottom: 48px;
 }
 #ciphers-tab-outputs > * {
   height: 100%;
