@@ -22,10 +22,10 @@ class Word {
     public letters: Letter[] = [],
     public cost: number = 0) {
   }
-}
 
-function wordString(word: Word) {
-  return _.map(word.letters, "letter").join("");
+  public asText(): string {
+    return _.map(this.letters, "letter").join("");
+  }
 }
 
 class Step {
@@ -57,7 +57,7 @@ export function unweave(text: string): Promise<Result[]> {
       let step: Step;
       if (wordStepQueue.length === 0 && prefixStepQueue.length === 0) {
         resolve(solver.getResults().map((result) => new Result(
-          result.solution.map(wordString),
+          result.solution.map((word) => word.asText()),
           result.cost)));
         return;
       } else if (wordStepQueue.length > 0 && wordStepQueue[wordStepQueue.length - 1].letters.length === 0) {
