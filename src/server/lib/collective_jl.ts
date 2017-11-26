@@ -1,7 +1,9 @@
 import * as _ from "lodash";
 
-// tslint:disable-next-line:no-var-requires
+// tslint:disable:no-var-requires
+require("../../../build/Release/julia_loader");
 const collectiveJl = require("../../../build/Release/collective_jl");
+// tslint:enable:no-var-requires
 
 export interface IFeatureResult {
   description: string;

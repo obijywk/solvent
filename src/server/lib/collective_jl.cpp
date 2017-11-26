@@ -1,12 +1,14 @@
 #include <iostream>
 
-#include <dlfcn.h>
 #include <julia.h>
 #include <napi.h>
 
 using namespace Napi;
 
-jl_module_t* julia_collective;
+jl_function_t* julia_corpus_function;
+jl_function_t* julia_analyze_function;
+jl_function_t* julia_getindex_function;
+
 jl_value_t* julia_corpus;
 
 jl_array_t* ConvertNodeStringArrayToJuliaArray(const Value& node_array_value) {
@@ -39,7 +41,6 @@ Value BuildCorpus(const CallbackInfo& callback_info) {
   }
 
   jl_array_t* julia_words_array = ConvertNodeStringArrayToJuliaArray(node_words_value);
-  jl_function_t* julia_corpus_function = jl_get_function(julia_collective, "Corpus");
   julia_corpus = jl_call1(julia_corpus_function, (jl_value_t*) julia_words_array);
 
   return env.Null();
@@ -60,7 +61,6 @@ Value Analyze(const CallbackInfo& callback_info) {
   }
 
   jl_array_t* julia_words_array = ConvertNodeStringArrayToJuliaArray(node_words_value);
-  jl_function_t* julia_analyze_function = jl_get_function(julia_collective, "analyze");
   jl_array_t* julia_results = (jl_array_t*) jl_call3(
     julia_analyze_function,
     julia_corpus,
@@ -68,7 +68,6 @@ Value Analyze(const CallbackInfo& callback_info) {
     jl_box_uint32(0));
 
   Array node_results = Array::New(env, jl_array_len(julia_results));
-  jl_function_t* julia_getindex_function = jl_get_function(jl_base_module, "getindex");
   for (size_t i = 0; i < jl_array_len(julia_results); i++) {
     jl_value_t* julia_result = jl_arrayref(julia_results, i);
     Object node_result = Object::New(env);
@@ -100,10 +99,11 @@ Value Analyze(const CallbackInfo& callback_info) {
 }
 
 Object Init(Env env, Object exports) {
-  dlopen("/usr/lib/x86_64-linux-gnu/libjulia.so", RTLD_GLOBAL | RTLD_LAZY);
-  jl_init(nullptr);
   jl_eval_string("using Collective");
-  julia_collective = (jl_module_t*) jl_eval_string("Collective");
+  jl_module_t* julia_collective = (jl_module_t*) jl_eval_string("Collective");
+  julia_corpus_function = jl_get_function(julia_collective, "Corpus");
+  julia_analyze_function = jl_get_function(julia_collective, "analyze");
+  julia_getindex_function = jl_get_function(jl_base_module, "getindex");
 
   exports.Set(String::New(env, "buildCorpus"), Function::New(env, BuildCorpus));
   exports.Set(String::New(env, "analyze"), Function::New(env, Analyze));
