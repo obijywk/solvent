@@ -88,19 +88,26 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  margin-top: 16px;
+}
+#codes-tab-container .credits {
+  margin-left: 16px;
+  margin-right: 16px;
 }
 #codes-tab-text-container {
   flex: 0;
-  margin: 16px;
-}
-#codes-tab-buttons {
   margin-left: 16px;
   margin-right: 16px;
+}
+#codes-tab-buttons {
   display: flex;
   justify-content: flex-end;
+  margin-left: 16px;
+  margin-right: 16px;
 }
 #codes-tab-pickers {
   margin-top: auto;
+  margin-bottom: 16px;
 }
 #codes-tab-picker-cards > .card {
   margin: 16px;
