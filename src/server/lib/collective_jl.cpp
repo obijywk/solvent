@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <julia.h>
 #include <napi.h>
 
@@ -43,14 +41,24 @@ Value BuildCorpus(const CallbackInfo& callback_info) {
   jl_array_t* julia_words_array = ConvertNodeStringArrayToJuliaArray(node_words_value);
   julia_corpus = jl_call1(julia_corpus_function, (jl_value_t*) julia_words_array);
 
+  if (jl_exception_occurred()) {
+    Error::New(env, jl_typeof_str(jl_exception_occurred())).ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (julia_corpus == nullptr) {
+    Error::New(env, "Collective.jl corpus creation failed").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
   return env.Null();
 }
 
 Value Analyze(const CallbackInfo& callback_info) {
   Env env = callback_info.Env();
 
-  if (callback_info.Length() != 1) {
-    TypeError::New(env, "Wrong number of arguments; expected 1").ThrowAsJavaScriptException();
+  if (callback_info.Length() != 2) {
+    TypeError::New(env, "Wrong number of arguments; expected 2").ThrowAsJavaScriptException();
     return env.Null();
   }
 
@@ -60,12 +68,33 @@ Value Analyze(const CallbackInfo& callback_info) {
     return env.Null();
   }
 
+  Value node_allowed_misses_value = callback_info[1];
+  if (!node_allowed_misses_value.IsNumber()) {
+    TypeError::New(env, "Wrong type of argument; expected number").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (julia_corpus == nullptr) {
+    Error::New(env, "Collective.jl corpus was not created").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
   jl_array_t* julia_words_array = ConvertNodeStringArrayToJuliaArray(node_words_value);
   jl_array_t* julia_results = (jl_array_t*) jl_call3(
     julia_analyze_function,
     julia_corpus,
     (jl_value_t*) julia_words_array,
-    jl_box_uint32(0));
+    jl_box_uint32(node_allowed_misses_value.As<Number>().Uint32Value()));
+
+  if (jl_exception_occurred()) {
+    Error::New(env, jl_typeof_str(jl_exception_occurred())).ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (julia_results == nullptr) {
+    Error::New(env, "Collective.jl analyze failed").ThrowAsJavaScriptException();
+    return env.Null();
+  }
 
   Array node_results = Array::New(env, jl_array_len(julia_results));
   for (size_t i = 0; i < jl_array_len(julia_results); i++) {

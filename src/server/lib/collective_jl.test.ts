@@ -5,30 +5,40 @@ import * as collectiveJl from "./collective_jl";
 
 /* tslint:disable:no-unused-expression */
 
-const corpus = [
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "indigo",
-  "violet",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine",
-];
-
 describe("collective_jl", () => {
-  it("analyze", () => {
-    collectiveJl.buildCorpus(corpus);
-    const results = collectiveJl.analyze(["one", "two"]);
-    const processedResults = collectiveJl.sortAndFilter(results, 10);
-    expect(processedResults).to.have.length(10);
-  }).timeout(10000);
+  before(function() {
+    this.timeout(10000);
+    return collectiveJl.initialized;
+  });
+
+  it("analyze returns correct results", () => {
+    const puzzle = [
+      "questionable",
+      "businesswoman",
+      "exhaustion",
+      "discouraged",
+      "communicated",
+      "hallucinogen",
+      "sequoia",
+    ];
+
+    const results = collectiveJl.analyze(puzzle, {
+      allowedMisses: 2,
+      maxResults: 2,
+    });
+
+    expect(results).to.have.length(2);
+
+    expect(results[0].description).to.equal("has 5 unique vowels");
+    expect(results[0].satisfied).to.eql(puzzle);
+
+    expect(results[1].description).to.equal("has 10 unique letters");
+    expect(results[1].satisfied).to.eql([
+      "businesswoman",
+      "exhaustion",
+      "discouraged",
+      "communicated",
+      "hallucinogen",
+    ]);
+  });
 });
