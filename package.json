@@ -34,13 +34,14 @@
     "webpack": "^3.8.1"
   },
   "scripts": {
-    "build-and-run": "npm run build-client && npm run build-server && npm run run-server",
+    "build-and-run": "npm run build-client && npm run build-native && npm run build-server && npm run run-server",
     "build-client": "webpack",
+    "build-native": "node-gyp build",
     "build-server": "tsc",
-    "check-all": "npm run build-client && npm run build-server && npm run lint-server && npm run test",
+    "check-all": "npm run build-client && npm run build-native && npm run build-server && npm run lint-server && npm run test",
     "lint-server": "tslint -c tslint.json 'src/server/**/*.ts'",
-    "run-server": "DEBUG=solvent nodejs built/server/server.js",
-    "test": "mocha --reporter spec --require ts-node/register 'src/**/*.test.ts'"
+    "run-server": "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjulia.so DEBUG=solvent nodejs built/server/server.js",
+    "test": "LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjulia.so mocha --reporter spec --require ts-node/register 'src/**/*.test.ts'"
   },
   "dependencies": {
     "@types/debug": "0.0.30",
@@ -48,6 +49,8 @@
     "@types/lodash": "^4.14.80",
     "debug": "^3.1.0",
     "express": "^4.16.2",
-    "lodash": "^4.17.4"
-  }
+    "lodash": "^4.17.4",
+    "node-addon-api": "^1.1.0"
+  },
+  "gypfile": "true"
 }

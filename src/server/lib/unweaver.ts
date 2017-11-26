@@ -1,9 +1,10 @@
 import * as _ from "lodash";
 
+import { setImmediate } from "timers";
+
 import * as fitnessStats from "./fitness_stats";
 import { SolutionCostSolver } from "./solution_cost_solver";
 import { ValueTrieNode } from "./value_trie";
-import { setImmediate } from "timers";
 
 export class Result {
   constructor(
