@@ -1,0 +1,35 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: add Node.js apt key
+    apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key state=present validate_certs=no
+    become: true
+
+  - name: add Node.js binary repository
+    apt_repository: repo='deb https://deb.nodesource.com/node_6.x xenial main' state=present
+    become: true
+
+  - name: add Julia binary repository
+    apt_repository: repo='ppa:staticfloat/juliareleases' state=present
+    become: true
+
+  - name: install Node.js
+    apt: name=nodejs state=present update_cache=yes
+    become: true
+
+  - name: allow Node.js to bind to any port
+    command: setcap 'cap_net_bind_service=+ep' /usr/bin/node
+    changed_when: False
+    become: true
+
+  - name: install build-essential
+    apt: name=build-essential state=present update_cache=yes
+    become: true
+
+  - name: install Julia
+    apt: name=julia state=present update_cache=yes
+    become: true
+
+  - name: install Collective.jl
+    command: julia -e 'Pkg.clone("https://github.com/rdeits/Collective.jl.git")' creates=/home/ubuntu/.julia/v0.5/Collective/**
