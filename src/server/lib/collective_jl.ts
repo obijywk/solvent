@@ -46,9 +46,7 @@ export function analyze(words: string[], options: Partial<IAnalyzeOptions> = {})
     maxResults: 10,
     ...options,
   };
-  const results = collectiveJl.analyze(words, fullOptions.allowedMisses);
-  return _.chain(results)
-    .sortBy("probability")
-    .take(fullOptions.maxResults)
-    .value();
+  const results: IFeatureResult[] = collectiveJl.analyze(words, fullOptions.allowedMisses);
+  const sortedResults = _.sortBy(results, "probability");
+  return _.take(sortedResults, fullOptions.maxResults);
 }
