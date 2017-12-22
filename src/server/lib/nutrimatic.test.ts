@@ -19,6 +19,19 @@ describe("nutrimatic", () => {
     });
   });
 
+  it("search respects max results", () => {
+    return nutrimatic.search("AAA", {maxResults: 2}).then((results) => {
+      expect(results).to.have.length(2);
+    });
+  });
+
+  it("search respects max seconds", () => {
+    const startTime = Date.now();
+    return nutrimatic.search("AAAAA", {maxResults: 99999999, maxSeconds: 0.01}).then((results) => {
+      expect(Date.now() - startTime).to.be.lessThan(20);
+    });
+  });
+
   it("search fails with unparseable pattern", () => {
     expect(() => nutrimatic.searchIterator("(")).to.throw();
   });
