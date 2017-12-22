@@ -40,7 +40,7 @@
   "scripts": {
     "build-and-run": "npm run build-client && npm run build-native && npm run build-server && npm run run-server",
     "build-client": "webpack",
-    "build-native": "node-gyp build",
+    "build-native": "node-gyp configure && node-gyp build",
     "build-server": "tsc",
     "check-all": "npm run build-client && npm run build-native && npm run build-server && npm run lint-server && npm run test",
     "lint-server": "tslint -c tslint.json 'src/server/**/*.ts'",
