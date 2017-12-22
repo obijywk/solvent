@@ -4,11 +4,13 @@ import * as http from "http";
 
 import * as collectiveJl from "./lib/collective_jl";
 import * as fitnessStats from "./lib/fitness_stats";
+import * as nutrimatic from "./lib/nutrimatic";
 
 import { internalServerError } from "./api/error_response";
 
 import * as analyzeWithCollectiveJl from "./api/analyze_with_collective_jl";
 import * as scoreEnglish from "./api/score_english";
+import * as searchNutrimatic from "./api/search_nutrimatic";
 import * as solveCipher from "./api/solve_cipher";
 
 const debug = debugCreator("solvent");
@@ -21,6 +23,7 @@ app.use("/dist", express.static("./dist"));
 
 analyzeWithCollectiveJl.install(app);
 scoreEnglish.install(app);
+searchNutrimatic.install(app);
 solveCipher.install(app);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -31,6 +34,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 Promise.all([
   collectiveJl.initialized,
   fitnessStats.initialized,
+  nutrimatic.initialized,
 ]).then(() => {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {

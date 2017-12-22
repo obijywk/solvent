@@ -2,7 +2,7 @@
 const nutrimatic = require("../../../build/Release/nutrimatic");
 // tslint:enable:no-var-requires
 
-interface ISearchOptions {
+export interface ISearchOptions {
   maxResults: number;
   maxSeconds: number;
 }
