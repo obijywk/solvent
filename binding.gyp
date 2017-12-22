@@ -12,10 +12,8 @@
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
       ],
-      "cflags!": ["-fno-exceptions"],
-      "cflags_cc!": ["-fno-exceptions"],
       "defines": [
-        "NAPI_CPP_EXCEPTIONS"
+        "NAPI_DISABLE_CPP_EXCEPTIONS"
       ]
     },
     {
@@ -30,10 +28,8 @@
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
       ],
-      "cflags!": ["-fno-exceptions"],
-      "cflags_cc!": ["-fno-exceptions"],
       "defines": [
-        "NAPI_CPP_EXCEPTIONS",
+        "NAPI_DISABLE_CPP_EXCEPTIONS",
         "JULIA_LIB_PATH=\"/usr/lib/x86_64-linux-gnu/libjulia.so\""
       ]
     },
@@ -72,7 +68,7 @@
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
       ],
-      "cflags!": [
+      "cflags": [
         "-std=c++11",
         "-g",
         "-O6",
@@ -80,10 +76,10 @@
         "-Werror",
         "-Wno-unused-local-typedefs",
         "-Wno-uninitialized",
-        "-fno-exceptions",
-        "-Wno-sign-compare"
+        "-Wno-sign-compare",
+        "-fexceptions"
       ],
-      "cflags_cc!": [
+      "cflags_cc": [
         "-std=c++11",
         "-g",
         "-O6",
@@ -91,8 +87,8 @@
         "-Werror",
         "-Wno-unused-local-typedefs",
         "-Wno-uninitialized",
-        "-fno-exceptions",
-        "-Wno-sign-compare"
+        "-Wno-sign-compare",
+        "-fexceptions"
       ],
       "libraries": [
         "-lfst",
@@ -100,7 +96,7 @@
         "-ldl"
       ],
       "defines": [
-        "NAPI_CPP_EXCEPTIONS"
+        "NAPI_DISABLE_CPP_EXCEPTIONS"
       ]
     }
   ]

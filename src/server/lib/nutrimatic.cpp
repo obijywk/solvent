@@ -20,6 +20,7 @@ class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
     static void Initialize(Napi::Env& env, Napi::Object& target) {
       Function constructor = DefineClass(env, "SearchIterator", {
         InstanceMethod("next", &SearchIterator::Next),
+        InstanceMethod("end", &SearchIterator::End),
       });
       target.Set("SearchIterator", constructor);
     }
@@ -61,12 +62,21 @@ class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
 
     Napi::Value Next(const CallbackInfo& callback_info) {
       Napi::Env env = callback_info.Env();
-
-      while (!search_driver_->step()) {}
-
+      if (search_driver_.get()) {
+        try {
+          search_driver_->next();
+        } catch (const std::bad_alloc& e) {
+          End(callback_info);
+          Error::New(env, "nutrimatic ran out of memory").ThrowAsJavaScriptException();
+          return env.Undefined();
+        }
+      }
       Object item = Object::New(env);
-      if (search_driver_->text == nullptr) {
+      if (!search_driver_.get() || search_driver_->text == nullptr) {
         item["done"] = Boolean::New(env, true);
+        if (search_driver_.get()) {
+          End(callback_info);
+        }
       } else {
         item["done"] = Boolean::New(env, false);
         int text_length = strlen(search_driver_->text);
@@ -79,6 +89,11 @@ class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
         item["value"] = result;
       }
       return item;
+    }
+
+    void End(const CallbackInfo& callback_info) {
+      search_driver_.reset(nullptr);
+      expr_filter_.reset(nullptr);
     }
 
   private:

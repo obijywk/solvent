@@ -36,6 +36,8 @@ export function install(app: Express) {
           searchNutrimaticResponse.results.push(result as SearchNutrimaticResult);
         }
         res.send(searchNutrimaticResponse);
+      }).catch((err) => {
+        internalServerError(res, err.toString());
       });
     } catch (err) {
       internalServerError(res, err.toString());
