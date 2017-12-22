@@ -1,17 +1,20 @@
 ---
-- hosts: 127.0.0.1
+- hosts: all
   connection: local
   tasks:
+  - name: detect if running within Vagrant with local solvent git repo
+    stat:
+      path: /vagrant/repo
+    register: vagrant_repo_stat
+
+  # Set up Node.js
+
   - name: add Node.js apt key
     apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key state=present validate_certs=no
     become: true
 
   - name: add Node.js binary repository
-    apt_repository: repo='deb https://deb.nodesource.com/node_6.x xenial main' state=present
-    become: true
-
-  - name: add Julia binary repository
-    apt_repository: repo='ppa:staticfloat/juliareleases' state=present
+    apt_repository: repo='deb https://deb.nodesource.com/node_6.x zesty main' state=present
     become: true
 
   - name: install Node.js
@@ -21,6 +24,12 @@
   - name: allow Node.js to bind to any port
     command: setcap 'cap_net_bind_service=+ep' /usr/bin/node
     changed_when: False
+    become: true
+
+  # Set up Julia and Collective.jl
+
+  - name: add Julia binary repository
+    apt_repository: repo='ppa:staticfloat/juliareleases' state=present
     become: true
 
   - name: install build-essential
@@ -33,3 +42,34 @@
 
   - name: install Collective.jl
     command: julia -e 'Pkg.clone("https://github.com/rdeits/Collective.jl.git")' creates=/home/ubuntu/.julia/v0.5/Collective/**
+
+  # Set up Nutrimatic
+
+  - name: install libfst-dev
+    apt: name=libfst-dev state=present update_cache=yes
+    become: true
+
+  - name: clone Nutrimatic
+    git:
+      repo: 'https://github.com/egnor/nutrimatic.git'
+      dest: /home/ubuntu/nutrimatic
+
+  # Set up solvent
+
+  - name: clone solvent
+    git:
+      repo: 'https://github.com/obijywk/solvent.git'
+      dest: /home/ubuntu/solvent
+    when: not vagrant_repo_stat.stat.exists
+
+  - name: symlink solvent
+    file:
+      src: /vagrant/repo
+      dest: /home/ubuntu/solvent
+      state: link
+    when: vagrant_repo_stat.stat.exists
+
+  - name: npm install solvent
+    command: npm install
+    args:
+      chdir: /home/ubuntu/solvent
