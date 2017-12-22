@@ -12,7 +12,80 @@ using namespace fst;
 
 SymbolTable* symbol_table = nullptr;
 FILE* index_file = nullptr;
+IndexReader* index_reader = nullptr;
 StdVectorFst space;
+
+class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
+  public:
+    static void Initialize(Napi::Env& env, Napi::Object& target) {
+      Function constructor = DefineClass(env, "SearchIterator", {
+        InstanceMethod("next", &SearchIterator::Next),
+      });
+      target.Set("SearchIterator", constructor);
+    }
+
+    SearchIterator(const CallbackInfo& callback_info) : ObjectWrap(callback_info) {
+      Napi::Env env = callback_info.Env();
+
+      if (symbol_table == nullptr || index_reader == nullptr) {
+        Error::New(env, "nutrimatic is not initialized").ThrowAsJavaScriptException();
+        return;
+      }
+
+      if (callback_info.Length() != 1) {
+        TypeError::New(env, "Wrong number of arguments; expected 1").ThrowAsJavaScriptException();
+        return;
+      }
+
+      Napi::Value pattern_value = callback_info[0];
+      if (!pattern_value.IsString()) {
+        TypeError::New(env, "Wrong type of argument; expected string").ThrowAsJavaScriptException();
+        return;
+      }
+      String pattern_string = pattern_value.As<String>();
+
+      parsed_pattern_.SetInputSymbols(symbol_table);
+      parsed_pattern_.SetOutputSymbols(symbol_table);
+      const char *p = ParseExpr(pattern_string.Utf8Value().c_str(), &parsed_pattern_, false);
+      if (p == nullptr || *p != '\0') {
+        TypeError::New(env, "Failed to parse search pattern").ThrowAsJavaScriptException();
+        return;
+      }
+
+      // Require a space at the end, so the matches must be complete words.
+      Concat(&parsed_pattern_, space);
+
+      expr_filter_.reset(new ExprFilter(parsed_pattern_));
+      search_driver_.reset(new SearchDriver(index_reader, expr_filter_.get(), expr_filter_->start(), 1e-6));
+    }
+
+    Napi::Value Next(const CallbackInfo& callback_info) {
+      Napi::Env env = callback_info.Env();
+
+      while (!search_driver_->step()) {}
+
+      Object item = Object::New(env);
+      if (search_driver_->text == nullptr) {
+        item["done"] = Boolean::New(env, true);
+      } else {
+        item["done"] = Boolean::New(env, false);
+        int text_length = strlen(search_driver_->text);
+        while (text_length > 0 && search_driver_->text[text_length - 1] == ' ') {
+          --text_length;
+        }
+        Object result = Object::New(env);
+        result["score"] = Number::New(env, search_driver_->score);
+        result["text"] = String::New(env, search_driver_->text, text_length);
+        item["value"] = result;
+      }
+      return item;
+    }
+
+  private:
+    StdVectorFst parsed_pattern_;
+    std::unique_ptr<ExprFilter> expr_filter_;
+    std::unique_ptr<SearchDriver> search_driver_;
+};
 
 Value Initialize(const CallbackInfo& callback_info) {
   Env env = callback_info.Env();
@@ -29,71 +102,16 @@ Value Initialize(const CallbackInfo& callback_info) {
     Error::New(env, "failed to open data/wikipedia.index").ThrowAsJavaScriptException();
     return env.Null();
   }
+  index_reader = new IndexReader(index_file);
 
   ParseExpr(" ", &space, true);
 
   return env.Null();
 }
 
-Value Search(const CallbackInfo& callback_info) {
-  Env env = callback_info.Env();
-
-  if (symbol_table == nullptr || index_file == nullptr) {
-    Error::New(env, "nutrimatic is not initialized").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-
-  if (callback_info.Length() != 1) {
-    TypeError::New(env, "Wrong number of arguments; expected 1").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-
-  Value pattern_value = callback_info[0];
-  if (!pattern_value.IsString()) {
-    TypeError::New(env, "Wrong type of argument; expected string").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-  String pattern_string = pattern_value.As<String>();
-
-  StdVectorFst parsed;
-  parsed.SetInputSymbols(symbol_table);
-  parsed.SetOutputSymbols(symbol_table);
-  const char *p = ParseExpr(pattern_string.Utf8Value().c_str(), &parsed, false);
-  if (p == nullptr || *p != '\0') {
-    TypeError::New(env, "Failed to parse search pattern").ThrowAsJavaScriptException();
-    return env.Null();
-  }
-
-  // Require a space at the end, so the matches must be complete words.
-  Concat(&parsed, space);
-
-  ExprFilter expr_filter(parsed);
-  IndexReader index_reader(index_file);
-  SearchDriver search_driver(&index_reader, &expr_filter, expr_filter.start(), 1e-6);
-
-  Array results = Array::New(env);
-  while (results.Length() < 10) {
-    if (search_driver.step()) {
-      if (search_driver.text == nullptr) {
-        break;
-      }
-      int text_length = strlen(search_driver.text);
-      while (text_length > 0 && search_driver.text[text_length - 1] == ' ') {
-        --text_length;
-      }
-      Object result = Object::New(env);
-      result["score"] = Number::New(env, search_driver.score);
-      result["text"] = String::New(env, search_driver.text, text_length);
-      results[results.Length()] = result;
-    }
-  }
-
-  return results;
-}
-
 Object Init(Env env, Object exports) {
   exports.Set(String::New(env, "initialize"), Function::New(env, Initialize));
-  exports.Set(String::New(env, "search"), Function::New(env, Search));
+  SearchIterator::Initialize(env, exports);
   return exports;
 }
 
