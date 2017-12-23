@@ -18,3 +18,4 @@ borrowed from other projects, including:
 * [This excellent codesheet](http://www.derf.net/encodings/codesheet.pdf) by NeilFred Picciotto
 * Hermit Dave's [frequency word lists](https://github.com/hermitdave/FrequencyWords)
 * English quadgram statistics from [Practical Cryptography](http://practicalcryptography.com/cryptanalysis/text-characterisation/quadgrams/)
+* Donohoe's [NYTimes Crossword Data](https://github.com/donohoe/nyt-crossword)

@@ -54,6 +54,13 @@
       repo: 'https://github.com/egnor/nutrimatic.git'
       dest: /home/ubuntu/nutrimatic
 
+  # Download crossword clues data
+
+  - name: clone donohoe/nyt-crossword
+    git:
+      repo: 'https://github.com/donohoe/nyt-crossword'
+      dest: /home/ubuntu/nyt-crossword
+
   # Set up solvent
 
   - name: clone solvent
@@ -71,5 +78,10 @@
 
   - name: npm install solvent
     command: npm install
+    args:
+      chdir: /home/ubuntu/solvent
+
+  - name: build and test all of solvent
+    command: npm run check-all
     args:
       chdir: /home/ubuntu/solvent

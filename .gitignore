@@ -1,5 +1,6 @@
 build
 built
+data/clues.db
 data/wikipedia.index
 dist
 node_modules
