@@ -124,7 +124,7 @@ export default class CollectiveJlTab extends Vue {
   }
 
   get words(): string[] {
-    return this.text.split(" ");
+    return this.text.replace(/\n/g, " ").split(" ");
   }
 
   get wordCount(): number {

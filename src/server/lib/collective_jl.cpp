@@ -87,7 +87,9 @@ Value Analyze(const CallbackInfo& callback_info) {
     jl_box_uint32(node_allowed_misses_value.As<Number>().Uint32Value()));
 
   if (jl_exception_occurred()) {
-    Error::New(env, jl_typeof_str(jl_exception_occurred())).ThrowAsJavaScriptException();
+    std::string message = "Julia exception: ";
+    message.append(jl_typeof_str(jl_exception_occurred()));
+    Error::New(env, message).ThrowAsJavaScriptException();
     return env.Null();
   }
 
