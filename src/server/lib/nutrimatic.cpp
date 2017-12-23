@@ -45,18 +45,19 @@ class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
       }
       String pattern_string = pattern_value.As<String>();
 
-      parsed_pattern_.SetInputSymbols(symbol_table);
-      parsed_pattern_.SetOutputSymbols(symbol_table);
-      const char *p = ParseExpr(pattern_string.Utf8Value().c_str(), &parsed_pattern_, false);
+      StdVectorFst parsed_pattern;
+      parsed_pattern.SetInputSymbols(symbol_table);
+      parsed_pattern.SetOutputSymbols(symbol_table);
+      const char *p = ParseExpr(pattern_string.Utf8Value().c_str(), &parsed_pattern, false);
       if (p == nullptr || *p != '\0') {
         TypeError::New(env, "Failed to parse search pattern").ThrowAsJavaScriptException();
         return;
       }
 
       // Require a space at the end, so the matches must be complete words.
-      Concat(&parsed_pattern_, space);
+      Concat(&parsed_pattern, space);
 
-      expr_filter_.reset(new ExprFilter(parsed_pattern_));
+      expr_filter_.reset(new ExprFilter(parsed_pattern));
       search_driver_.reset(new SearchDriver(index_reader, expr_filter_.get(), expr_filter_->start(), 1e-6));
     }
 
@@ -97,7 +98,6 @@ class SearchIterator : public Napi::ObjectWrap<SearchIterator> {
     }
 
   private:
-    StdVectorFst parsed_pattern_;
     std::unique_ptr<ExprFilter> expr_filter_;
     std::unique_ptr<SearchDriver> search_driver_;
 };
