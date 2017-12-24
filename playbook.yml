@@ -80,8 +80,16 @@
     command: npm install
     args:
       chdir: /home/ubuntu/solvent
+      creates: /home/ubuntu/solvent/node_modules
+
+  - name: build clue database
+    command: npm run build-server && npm run build-clue-database
+    args:
+      chdir: /home/ubuntu/solvent
+      creates: /home/ubuntu/solvent/data/clues.db
 
   - name: build and test all of solvent
     command: npm run check-all
     args:
       chdir: /home/ubuntu/solvent
+    changed_when: False
