@@ -137,6 +137,10 @@ async function buildDatabase() {
     count += clueBatch.length;
     debug(`Processed ${count} clues`);
   }
+
+  debug("Optimizing database");
+  await runStatement(db.prepare("INSERT INTO cluefts(cluefts) VALUES('optimize')"));
+  await runStatement(db.prepare("VACUUM"));
 }
 
 buildDatabase().then(() => {
