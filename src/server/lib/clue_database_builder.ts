@@ -49,8 +49,7 @@ function readClues(csvParser: csvParse.Parser, finished: FinishedFlag): Promise<
           parseInt(rawDoc.id, 10),
           rawDoc.source,
           new Date(rawDoc.date),
-          parseInt(rawDoc.number, 10),
-          rawDoc.direction,
+          parseInt(rawDoc.number, 10) + rawDoc.direction,
           rawDoc.question,
           rawDoc.answer));
         if (clues.length >= 1000) {
@@ -69,8 +68,8 @@ function readClues(csvParser: csvParse.Parser, finished: FinishedFlag): Promise<
 
 function writeClues(clues: Clue[]): Promise<void> {
   const cluesInsertStatement = db.prepare(`
-  INSERT INTO clues (id, source, date, number, direction, question, answer)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO clues (id, source, puzzledate, cluelabel, question, answer)
+  VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   const clueftsInsertStatement = db.prepare(`
@@ -85,9 +84,8 @@ function writeClues(clues: Clue[]): Promise<void> {
       cluesInsertStatement.bind(
         clue.id,
         clue.source,
-        clue.date,
-        clue.clueNumber,
-        clue.direction,
+        Math.floor(clue.puzzleDate.getTime() / 1000),
+        clue.clueLabel,
         clue.question,
         clue.answer);
       promises.push(runStatement(cluesInsertStatement));
@@ -108,9 +106,8 @@ async function buildDatabase() {
     CREATE TABLE clues (
       id INTEGER PRIMARY KEY,
       source TEXT,
-      date DATE,
-      number INTEGER,
-      direction TEXT,
+      puzzledate DATE,
+      cluelabel TEXT,
       question TEXT,
       answer TEXT
     )`));
