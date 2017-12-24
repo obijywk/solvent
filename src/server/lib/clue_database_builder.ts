@@ -74,7 +74,7 @@ function writeClues(clues: Clue[]): Promise<void> {
   `);
 
   const clueftsInsertStatement = db.prepare(`
-  INSERT INTO cluefts (docid, question, answer)
+  INSERT INTO cluefts (rowid, question, answer)
   VALUES (?, ?, ?)
   `);
 
@@ -106,7 +106,7 @@ async function buildDatabase() {
   await runStatement(
     db.prepare(`
     CREATE TABLE clues (
-      id INTEGER,
+      id INTEGER PRIMARY KEY,
       source TEXT,
       date DATE,
       number INTEGER,
@@ -116,10 +116,10 @@ async function buildDatabase() {
     )`));
   await runStatement(
     db.prepare(`
-    CREATE VIRTUAL TABLE cluefts USING fts4 (
+    CREATE VIRTUAL TABLE cluefts USING fts5 (
       question,
       answer,
-      tokenize=porter
+      tokenize = 'porter unicode61'
     )`));
 
   const csvParser = new csvParse.Parser({
