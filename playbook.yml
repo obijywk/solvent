@@ -67,6 +67,7 @@
     git:
       repo: 'https://github.com/obijywk/solvent.git'
       dest: /home/ubuntu/solvent
+      update: no
     when: not vagrant_repo_stat.stat.exists
 
   - name: symlink solvent
@@ -83,7 +84,9 @@
       creates: /home/ubuntu/solvent/node_modules
 
   - name: build clue database
-    command: npm run build-server && npm run build-clue-database
+    shell: |
+      npm run build-server
+      npm run build-clue-database
     args:
       chdir: /home/ubuntu/solvent
       creates: /home/ubuntu/solvent/data/clues.db
