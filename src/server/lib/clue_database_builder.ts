@@ -8,9 +8,6 @@ import { Clue } from "./clue_database";
 const debug = debugCreator("solvent");
 
 const databasePath = "data/clues.db";
-if (fs.existsSync(databasePath)) {
-  fs.unlinkSync(databasePath);
-}
 sqlite3.verbose();
 const db = new sqlite3.Database(databasePath);
 // db.on("trace", (q) => debug(q));
@@ -101,6 +98,8 @@ function writeClues(clues: Clue[]): Promise<void> {
 }
 
 async function buildDatabase() {
+  await runStatement(db.prepare("DROP TABLE IF EXISTS clues"));
+  await runStatement(db.prepare("DROP TABLE IF EXISTS cluefts"));
   await runStatement(
     db.prepare(`
     CREATE TABLE clues (
