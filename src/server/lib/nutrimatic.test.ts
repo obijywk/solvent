@@ -26,9 +26,11 @@ describe("nutrimatic", () => {
   });
 
   it("search respects max seconds", () => {
-    const startTime = Date.now();
+    const startTime = process.hrtime();
     return nutrimatic.search("AAAAA", {maxResults: 99999999, maxSeconds: 0.01}).then((results) => {
-      expect(Date.now() - startTime).to.be.lessThan(20);
+      const elapsedHrtime = process.hrtime(startTime);
+      expect(elapsedHrtime[0]).to.equal(0);
+      expect(elapsedHrtime[1]).to.be.lessThan(50 * 1000000);
     });
   });
 
