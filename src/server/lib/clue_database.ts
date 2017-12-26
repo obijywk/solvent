@@ -38,7 +38,9 @@ export interface ISearchOptions {
 }
 
 export function search(options: Partial<ISearchOptions>): Promise<Clue[]> {
-  const whereExpressions: string[] = [];
+  const whereExpressions: string[] = [
+    "LENGTH(cluefts.question) > 0",
+  ];
   const params: { [param: string]: string | number } = {};
 
   if (options.matchQuery) {
