@@ -25,15 +25,6 @@ describe("nutrimatic", () => {
     });
   });
 
-  it("search respects max seconds", () => {
-    const startTime = process.hrtime();
-    return nutrimatic.search("AAAAA", {maxResults: 99999999, maxSeconds: 0.01}).then((results) => {
-      const elapsedHrtime = process.hrtime(startTime);
-      expect(elapsedHrtime[0]).to.equal(0);
-      expect(elapsedHrtime[1]).to.be.lessThan(50 * 1000000);
-    });
-  });
-
   it("search fails with unparseable pattern", () => {
     expect(() => nutrimatic.searchIterator("(")).to.throw();
   });
