@@ -32,6 +32,12 @@
         </v-btn>
         <span>Clear query</span>
       </v-tooltip>
+      <v-tooltip top>
+        <v-btn slot="activator" fab small color="error" @click="clearResults">
+          <v-icon>delete</v-icon>
+        </v-btn>
+        <span>Clear results</span>
+      </v-tooltip>
       <div class="clues-slider-container">
         <div class="clues-slider-label">
           Max<br>results
@@ -50,7 +56,7 @@
     </div>
 
     <div id="clues-results">
-      <div id="clues-progress" v-if="running">
+      <div id="clues-progress" v-if="state === State.RUNNING">
         <v-progress-circular indeterminate v-bind:size="64" color="primary" />
       </div>
       <v-data-table
@@ -58,7 +64,7 @@
         hide-actions
         hide-headers
         id="clues-tab-table"
-        v-if="!running && results.length"
+        v-if="state === State.RESULTS"
       >
         <template slot="items" slot-scope="props">
           <td class="hidden-sm-and-down">{{ props.item.source }}</td>
@@ -72,7 +78,7 @@
       </v-data-table>
       <div
         id="clues-instructions"
-        v-if="!running && !results.length"
+        v-if="state === State.INSTRUCTIONS"
       >
         <p>
           The clue database may be queried using
@@ -161,13 +167,21 @@ import {
   SearchCluesResult,
 } from "../api/search_clues";
 
+enum State {
+  INSTRUCTIONS,
+  RUNNING,
+  RESULTS,
+}
+
 @Component
 export default class CluesTab extends Vue {
   private maxResults: number = 100;
   private query: string = "";
   private answerPattern: string = "";
   private results: SearchCluesResult[] = [];
-  private running: boolean = false;
+
+  private State = State;
+  private state: State = State.INSTRUCTIONS;
 
   private formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString();
@@ -176,7 +190,12 @@ export default class CluesTab extends Vue {
   private clear() {
     this.query = "";
     this.answerPattern = "";
+    this.clearResults();
+  }
+
+  private clearResults() {
     this.results = [];
+    this.state = State.INSTRUCTIONS;
   }
 
   private search() {
@@ -187,7 +206,7 @@ export default class CluesTab extends Vue {
     if (this.answerPattern) {
       request.answerPattern = this.answerPattern;
     }
-    this.running = true;
+    this.state = State.RUNNING;
     fetch(SEARCH_CLUES_URL, {
       body: JSON.stringify(request),
       headers: new Headers({ "Content-Type": "application/json" }),
@@ -195,10 +214,10 @@ export default class CluesTab extends Vue {
     }).then((response) => response.json())
     .then((response: SearchCluesResponse) => {
       this.results = response.results;
-      this.running = false;
+      this.state = State.RESULTS;
     }).catch((error) => {
       this.results = [];
-      this.running = false;
+      this.state = State.INSTRUCTIONS;
     });
   }
 }
