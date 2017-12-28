@@ -11,12 +11,12 @@ export function install(app: Express) {
     const solveCipherRequest = req.body as SolveCipherRequest;
 
     if (!solveCipherRequest.ciphertext) {
-      badRequest(res, "ciphertext must be provided");
+      badRequest(res, "Ciphertext must be provided.");
       return;
     }
 
     if (solveCipherRequest.iterations > 5000) {
-      badRequest(res, "iterations must be 5000 or less");
+      badRequest(res, "Iterations must be 5000 or less.");
       return;
     }
 

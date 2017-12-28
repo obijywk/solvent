@@ -37,6 +37,7 @@ import Vue from "vue";
 import { Component, Prop } from "vue-property-decorator";
 
 import { SOLVE_CIPHER_URL, SolveCipherRequest, SolveCipherResponse, SolveCipherResult } from "../api/solve_cipher";
+import { apiFetch } from "../client/api_fetch";
 
 @Component
 export default class CipherSolver extends Vue {
@@ -58,14 +59,13 @@ export default class CipherSolver extends Vue {
       ciphertext: this.inputString,
       iterations: 2000,
     };
-    fetch(SOLVE_CIPHER_URL, {
-      body: JSON.stringify(request),
-      headers: new Headers({ "Content-Type": "application/json" }),
-      method: "POST",
-    }).then((response) => response.json())
-    .then((response: SolveCipherResponse) => {
+    apiFetch<SolveCipherResponse>(SOLVE_CIPHER_URL, request).then((response) => {
       this.results = response.results;
       this.solving = false;
+    }).catch((err: Error) => {
+      this.results = [];
+      this.solving = false;
+      this.$emit("error", err.message);
     });
   }
 }

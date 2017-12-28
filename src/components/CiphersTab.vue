@@ -34,6 +34,7 @@
       <cipher-solver-component ref="cipher-solver"
         v-show="activeComponent === ActiveComponent.CIPHER_SOLVER"
         :inputString="text"
+        @error="handleError($event)"
       />
     </div>
   </div>
@@ -102,6 +103,10 @@ export default class CiphersTab extends Vue {
   private substitution() {
     this.activeComponent = ActiveComponent.CIPHER_SOLVER;
     (this.$refs["cipher-solver"] as CipherSolverComponent).update();
+  }
+
+  private handleError(errorMessage: string) {
+    this.$emit("error", errorMessage);
   }
 }
 </script>
