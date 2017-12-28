@@ -23,6 +23,12 @@
         </v-btn>
         <span>Clear pattern</span>
       </v-tooltip>
+      <v-tooltip top>
+        <v-btn slot="activator" fab small color="error" @click="clearResults">
+          <v-icon>delete</v-icon>
+        </v-btn>
+        <span>Clear results</span>
+      </v-tooltip>
       <div class="nutrimatic-slider-container hidden-sm-and-down">
         <div class="nutrimatic-slider-label">
           Max<br>results
@@ -53,7 +59,7 @@
     </div>
 
     <div id="nutrimatic-results">
-      <div id="nutrimatic-progress" v-if="running">
+      <div id="nutrimatic-progress" v-if="state === State.RUNNING">
         <v-progress-circular indeterminate v-bind:size="64" color="primary" />
       </div>
       <v-data-table
@@ -61,7 +67,7 @@
         :items="results"
         hide-actions
         id="nutrimatic-tab-table"
-        v-if="!running && results.length"
+        v-if="state === State.RESULTS"
       >
         <template slot="items" slot-scope="props">
           <td>{{ props.item.score }}</td>
@@ -70,7 +76,7 @@
       </v-data-table>
       <div
         id="nutrimatic-instructions"
-        v-if="!running && !results.length"
+        v-if="state === State.INSTRUCTIONS"
       >
         <div class="g">
           <div class="c">a-z 0-9 space</div>
@@ -226,13 +232,21 @@ import {
   SearchNutrimaticResult,
 } from "../api/search_nutrimatic";
 
+enum State {
+  INSTRUCTIONS,
+  RUNNING,
+  RESULTS,
+}
+
 @Component
 export default class NutrimaticTab extends Vue {
   private maxResults: number = 50;
   private maxSeconds: number = 2;
   private pattern: string = "";
   private results: SearchNutrimaticResult[] = [];
-  private running: boolean = false;
+
+  private State = State;
+  private state: State = State.INSTRUCTIONS;
 
   private headers = [
     { text: "Score", value: "score", align: "left", sortable: false },
@@ -241,7 +255,12 @@ export default class NutrimaticTab extends Vue {
 
   private clear() {
     this.pattern = "";
+    this.clearResults();
+  }
+
+  private clearResults() {
     this.results = [];
+    this.state = State.INSTRUCTIONS;
   }
 
   private search() {
@@ -250,7 +269,7 @@ export default class NutrimaticTab extends Vue {
       maxSeconds: this.maxSeconds,
       pattern: this.pattern,
     };
-    this.running = true;
+    this.state = State.RUNNING;
     fetch(SEARCH_NUTRIMATIC_URL, {
       body: JSON.stringify(request),
       headers: new Headers({ "Content-Type": "application/json" }),
@@ -258,10 +277,10 @@ export default class NutrimaticTab extends Vue {
     }).then((response) => response.json())
     .then((response: SearchNutrimaticResponse) => {
       this.results = response.results;
-      this.running = false;
+      this.state = State.RESULTS;
     }).catch((error) => {
       this.results = [];
-      this.running = false;
+      this.state = State.INSTRUCTIONS;
     });
   }
 }
