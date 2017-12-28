@@ -10,10 +10,9 @@
       <v-text-field
         id="collective-jl-tab-text"
         label="Words (separated by spaces)"
-        textarea
-        rows="3"
         hide-details
         v-model="text"
+        v-on:keyup.enter="analyze()"
       />
     </div>
 
