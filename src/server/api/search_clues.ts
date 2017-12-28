@@ -24,14 +24,8 @@ export function install(app: Express) {
     const options: Partial<clueDatabase.ISearchOptions> = {
       matchQuery: searchCluesRequest.query,
     };
-    if (searchCluesRequest.minAnswerLength) {
-      options.minAnswerLength = searchCluesRequest.minAnswerLength;
-    }
-    if (searchCluesRequest.maxAnswerLength) {
-      options.maxAnswerLength = searchCluesRequest.maxAnswerLength;
-    }
-    if (searchCluesRequest.knownAnswerLetters) {
-      options.knownAnswerLetters = searchCluesRequest.knownAnswerLetters;
+    if (searchCluesRequest.answerPattern) {
+      options.answerPattern = searchCluesRequest.answerPattern;
     }
     if (searchCluesRequest.maxResults) {
       options.maxResults = searchCluesRequest.maxResults;

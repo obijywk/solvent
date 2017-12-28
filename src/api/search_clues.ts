@@ -1,8 +1,6 @@
 export class SearchCluesRequest {
   public query: string;
-  public minAnswerLength: number;
-  public maxAnswerLength: number;
-  public knownAnswerLetters: { [index: number]: string };
+  public answerPattern: string;
   public maxResults: number;
 }
 

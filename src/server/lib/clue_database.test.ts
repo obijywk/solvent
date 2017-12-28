@@ -20,24 +20,22 @@ describe("clue database", () => {
     });
   });
 
-  it("answer length restrictions work", () => {
+  it("answer pattern restrictions work", () => {
     return clueDatabase.search({
+      answerPattern: "________",
       matchQuery: "question: blue",
-      maxAnswerLength: 9,
       maxResults: 5,
-      minAnswerLength: 8,
     }).then((clues) => {
       expect(clues).has.length(5);
       for (const clue of clues) {
-        expect(clue.answer.length).to.be.gte(8);
-        expect(clue.answer.length).to.be.lte(9);
+        expect(clue.answer.length).to.equal(8);
       }
     });
   });
 
-  it("known letter restrictions work", () => {
+  it("known letter answer pattern restrictions work", () => {
     return clueDatabase.search({
-      knownAnswerLetters: {0: "T", 1: "A"},
+      answerPattern: "TA%",
       matchQuery: "question: story",
       maxResults: 3,
     }).then((clues) => {

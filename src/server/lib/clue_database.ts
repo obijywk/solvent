@@ -31,9 +31,7 @@ export const initialized = new Promise<void>((resolve) => {
 
 export interface ISearchOptions {
   matchQuery: string;
-  minAnswerLength: number;
-  maxAnswerLength: number;
-  knownAnswerLetters: { [index: number]: string };
+  answerPattern: string;
   maxResults: number;
 }
 
@@ -48,25 +46,9 @@ export function search(options: Partial<ISearchOptions>): Promise<Clue[]> {
     params.$matchQuery = options.matchQuery;
   }
 
-  if (options.minAnswerLength) {
-    whereExpressions.push("LENGTH(cluefts.answer) >= $minAnswerLength");
-    params.$minAnswerLength = options.minAnswerLength;
-  }
-
-  if (options.maxAnswerLength) {
-    whereExpressions.push("LENGTH(cluefts.answer) <= $maxAnswerLength");
-    params.$maxAnswerLength = options.maxAnswerLength;
-  }
-
-  if (options.knownAnswerLetters) {
-    for (const position in options.knownAnswerLetters) {
-      if (options.knownAnswerLetters.hasOwnProperty(position)) {
-        const letter = options.knownAnswerLetters[position];
-        whereExpressions.push(`SUBSTR(cluefts.answer, $position${position}, 1) = $knownLetter${position}`);
-        params[`$position${position}`] = parseInt(position, 10) + 1;
-        params[`$knownLetter${position}`] = letter;
-      }
-    }
+  if (options.answerPattern) {
+    whereExpressions.push("cluefts.answer LIKE $answerPattern");
+    params.$answerPattern = options.answerPattern;
   }
 
   const whereClause = "WHERE " + whereExpressions.join(" AND ");
