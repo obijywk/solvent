@@ -16,7 +16,7 @@ export function install(app: Express) {
     const searchNutrimaticRequest = req.body as SearchNutrimaticRequest;
 
     if (!searchNutrimaticRequest.pattern || searchNutrimaticRequest.pattern.length === 0) {
-      badRequest(res, "pattern must be provided");
+      badRequest(res, "A pattern must be provided.");
       return;
     }
 

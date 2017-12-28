@@ -231,6 +231,7 @@ import {
   SearchNutrimaticResponse,
   SearchNutrimaticResult,
 } from "../api/search_nutrimatic";
+import { apiFetch } from "../client/api_fetch";
 
 enum State {
   INSTRUCTIONS,
@@ -270,17 +271,13 @@ export default class NutrimaticTab extends Vue {
       pattern: this.pattern,
     };
     this.state = State.RUNNING;
-    fetch(SEARCH_NUTRIMATIC_URL, {
-      body: JSON.stringify(request),
-      headers: new Headers({ "Content-Type": "application/json" }),
-      method: "POST",
-    }).then((response) => response.json())
-    .then((response: SearchNutrimaticResponse) => {
+    apiFetch<SearchNutrimaticResponse>(SEARCH_NUTRIMATIC_URL, request).then((response) => {
       this.results = response.results;
       this.state = State.RESULTS;
-    }).catch((error) => {
+    }).catch((err: Error) => {
       this.results = [];
       this.state = State.INSTRUCTIONS;
+      this.$emit("error", err.message);
     });
   }
 }
