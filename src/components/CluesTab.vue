@@ -166,6 +166,7 @@ import {
   SearchCluesResponse,
   SearchCluesResult,
 } from "../api/search_clues";
+import { apiFetch } from "../client/api_fetch";
 
 enum State {
   INSTRUCTIONS,
@@ -207,17 +208,13 @@ export default class CluesTab extends Vue {
       request.answerPattern = this.answerPattern;
     }
     this.state = State.RUNNING;
-    fetch(SEARCH_CLUES_URL, {
-      body: JSON.stringify(request),
-      headers: new Headers({ "Content-Type": "application/json" }),
-      method: "POST",
-    }).then((response) => response.json())
-    .then((response: SearchCluesResponse) => {
+    apiFetch<SearchCluesResponse>(SEARCH_CLUES_URL, request).then((response) => {
       this.results = response.results;
       this.state = State.RESULTS;
-    }).catch((error) => {
+    }).catch((err: Error) => {
       this.results = [];
       this.state = State.INSTRUCTIONS;
+      this.$emit("error", err.message);
     });
   }
 }
