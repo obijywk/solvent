@@ -11,22 +11,30 @@
       </v-tabs-bar>
       <v-tabs-items class="tabs-items" touchless>
         <v-tabs-content id="codes-tab" class="full-height" lazy>
-          <codes-tab-component />
+          <codes-tab-component @error="handleError($event)" />
         </v-tabs-content>
         <v-tabs-content id="ciphers-tab" class="full-height" lazy>
-          <ciphers-tab-component />
+          <ciphers-tab-component @error="handleError($event)" />
         </v-tabs-content>
         <v-tabs-content id="clues-tab" class="full-height" lazy>
-          <clues-tab-component />
+          <clues-tab-component @error="handleError($event)" />
         </v-tabs-content>
         <v-tabs-content id="collective-jl-tab" class="full-height" lazy>
-          <collective-jl-tab-component />
+          <collective-jl-tab-component @error="handleError($event)" />
         </v-tabs-content>
         <v-tabs-content id="nutrimatic-tab" class="full-height" lazy>
-          <nutrimatic-tab-component />
+          <nutrimatic-tab-component @error="handleError($event)" />
         </v-tabs-content>
       </v-tabs-items>
     </v-tabs>
+    <v-snackbar
+      id="error-snackbar"
+      color="error"
+      v-model="showErrorSnackbar"
+    >
+      {{ errorMessage }}
+      <v-btn dark flat @click.native="showErrorSnackbar = false">Close</v-btn>
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -67,5 +75,12 @@ import NutrimaticTabComponent from "./NutrimaticTab.vue";
   },
 })
 export default class App extends Vue {
+  private showErrorSnackbar: boolean = false;
+  private errorMessage: string = "";
+
+  private handleError(errorMessage: string) {
+    this.errorMessage = errorMessage;
+    this.showErrorSnackbar = true;
+  }
 }
 </script>

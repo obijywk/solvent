@@ -105,6 +105,7 @@ import {
   AnalyzeWithCollectiveJlResponse,
   AnalyzeWithCollectiveJlResult,
 } from "../api/analyze_with_collective_jl";
+import { apiFetch } from "../client/api_fetch";
 
 @Component
 export default class CollectiveJlTab extends Vue {
@@ -135,13 +136,10 @@ export default class CollectiveJlTab extends Vue {
       allowedMisses: this.allowedMisses,
       words: this.words,
     };
-    fetch(ANALYZE_WITH_COLLECTIVE_JL_URL, {
-      body: JSON.stringify(request),
-      headers: new Headers({ "Content-Type": "application/json" }),
-      method: "POST",
-    }).then((response) => response.json())
-    .then((response: AnalyzeWithCollectiveJlResponse) => {
+    apiFetch<AnalyzeWithCollectiveJlResponse>(ANALYZE_WITH_COLLECTIVE_JL_URL, request).then((response) => {
       this.results = response.results;
+    }).catch((err: Error) => {
+      this.$emit("error", err.message);
     });
   }
 }
