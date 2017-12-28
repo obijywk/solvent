@@ -16,15 +16,11 @@ export function install(app: Express) {
   app.post(SEARCH_CLUES_URL, (req, res) => {
     const searchCluesRequest = req.body as SearchCluesRequest;
 
-    if (!searchCluesRequest.query || searchCluesRequest.query.length === 0) {
-      badRequest(res, "query must be provided");
-      return;
+    const options: Partial<clueDatabase.ISearchOptions> = {};
+    if (searchCluesRequest.query && searchCluesRequest.query.length > 0) {
+      options.matchQuery = searchCluesRequest.query;
     }
-
-    const options: Partial<clueDatabase.ISearchOptions> = {
-      matchQuery: searchCluesRequest.query,
-    };
-    if (searchCluesRequest.answerPattern) {
+    if (searchCluesRequest.answerPattern && searchCluesRequest.answerPattern.length > 0) {
       options.answerPattern = searchCluesRequest.answerPattern;
     }
     if (searchCluesRequest.maxResults) {

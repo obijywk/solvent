@@ -15,6 +15,16 @@
       />
     </div>
 
+    <div id="clues-tab-answer-pattern-container">
+      <v-text-field
+        id="clues-tab-answer-pattern"
+        label="Answer Letters (use '_' for any letter, and '%' for any number of letters)"
+        hide-details
+        v-model="answerPattern"
+        v-on:keyup.enter="search()"
+      />
+    </div>
+
     <div id="clues-tab-buttons">
       <v-tooltip top>
         <v-btn slot="activator" fab small color="error" @click="clear">
@@ -68,20 +78,27 @@
           The clue database may be queried using
           <a href="https://sqlite.org/fts5.html#full_text_query_syntax" target="_blank">
           SQLite FTS5 query syntax</a>.
-          
+
           The field containing the clue is named <i>question</i> and the field
           containing the answer to the clue is named <i>answer</i>.
         </p>
         <p>
           A few example queries:
         </p>
-        <ul>
-          <li>pepsi</li>
-          <li>cola</li>
-          <li>question: pepsi</li>
-          <li>question: pepsi OR coca</li>
-          <li>answer: cola</li>
-        </ul>
+        <p>
+          <ul>
+            <li>pepsi</li>
+            <li>cola</li>
+            <li>question: pepsi</li>
+            <li>question: pepsi OR coca</li>
+            <li>answer: cola</li>
+          </ul>
+        </p>
+        <p>
+          Additionally, answer letters may be restricted by providing a
+          <a href="https://www.w3schools.com/sql/sql_like.asp" target="_blank">
+          SQL LIKE pattern</a> (where '_' matches any letter, and '%' matches any number of letters).
+        </p>
       </div>
     </div>
   </div>
@@ -148,6 +165,7 @@ import {
 export default class CluesTab extends Vue {
   private maxResults: number = 100;
   private query: string = "";
+  private answerPattern: string = "";
   private results: SearchCluesResult[] = [];
   private running: boolean = false;
 
@@ -157,6 +175,7 @@ export default class CluesTab extends Vue {
 
   private clear() {
     this.query = "";
+    this.answerPattern = "";
     this.results = [];
   }
 
@@ -165,6 +184,9 @@ export default class CluesTab extends Vue {
       maxResults: this.maxResults,
       query: this.query,
     };
+    if (this.answerPattern) {
+      request.answerPattern = this.answerPattern;
+    }
     this.running = true;
     fetch(SEARCH_CLUES_URL, {
       body: JSON.stringify(request),
