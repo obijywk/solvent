@@ -1,6 +1,8 @@
 ---
 - hosts: all
   connection: local
+  environment:
+    NODE_ENV: production
   tasks:
   - name: detect if running within Vagrant with local solvent git repo
     stat:

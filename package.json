@@ -28,6 +28,8 @@
     "tslint": "^5.8.0",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.5.3",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
+    "uglifyjs-webpack-plugin": "^1.1.5",
     "vue": "^2.5.2",
     "vue-class-component": "^6.0.0",
     "vue-loader": "^13.3.0",
