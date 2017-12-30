@@ -7,6 +7,7 @@
         <v-tabs-item href="#clues-tab">Clues</v-tabs-item>
         <v-tabs-item href="#collective-jl-tab">Collective.jl</v-tabs-item>
         <v-tabs-item href="#nutrimatic-tab">Nutrimatic</v-tabs-item>
+        <v-tabs-item href="#image-search-tab">Image Search</v-tabs-item>
         <v-tabs-slider></v-tabs-slider>
       </v-tabs-bar>
       <v-tabs-items class="tabs-items" touchless>
@@ -24,6 +25,9 @@
         </v-tabs-content>
         <v-tabs-content id="nutrimatic-tab" class="full-height" lazy>
           <nutrimatic-tab-component @error="handleError($event)" />
+        </v-tabs-content>
+        <v-tabs-content id="image-search-tab" class="full-height" lazy>
+          <image-search-tab-component @error="handleError($event)" />
         </v-tabs-content>
       </v-tabs-items>
     </v-tabs>
@@ -63,6 +67,7 @@ import CiphersTabComponent from "./CiphersTab.vue";
 import CluesTabComponent from "./CluesTab.vue";
 import CodesTabComponent from "./CodesTab.vue";
 import CollectiveJlTabComponent from "./CollectiveJlTab.vue";
+import ImageSearchTabComponent from "./ImageSearchTab.vue";
 import NutrimaticTabComponent from "./NutrimaticTab.vue";
 
 @Component({
@@ -71,6 +76,7 @@ import NutrimaticTabComponent from "./NutrimaticTab.vue";
     CluesTabComponent,
     CodesTabComponent,
     CollectiveJlTabComponent,
+    ImageSearchTabComponent,
     NutrimaticTabComponent,
   },
 })
