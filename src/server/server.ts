@@ -10,6 +10,7 @@ import * as nutrimatic from "./lib/nutrimatic";
 import { internalServerError } from "./api/error_response";
 
 import * as analyzeWithCollectiveJl from "./api/analyze_with_collective_jl";
+import * as runWebDetection from "./api/run_web_detection";
 import * as scoreEnglish from "./api/score_english";
 import * as searchClues from "./api/search_clues";
 import * as searchNutrimatic from "./api/search_nutrimatic";
@@ -18,12 +19,15 @@ import * as solveCipher from "./api/solve_cipher";
 const debug = debugCreator("solvent");
 
 const app = express();
-app.use(express.json());
+app.use(express.json({
+  limit: 4194304,
+}));
 
 app.use(express.static("./public"));
 app.use("/dist", express.static("./dist"));
 
 analyzeWithCollectiveJl.install(app);
+runWebDetection.install(app);
 scoreEnglish.install(app);
 searchClues.install(app);
 searchNutrimatic.install(app);

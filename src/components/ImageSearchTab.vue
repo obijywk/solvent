@@ -1,11 +1,19 @@
 <template>
   <div id="image-search-tab-container">
-    <div>
-      <input type="file" ref="fileInput" @change="handleFileInputChange()" />
+    <div id="image-search-tab-buttons">
+      <input
+        type="file"
+        id="image-search-tab-file-input"
+        ref="fileInput"
+        @change="handleFileInputChange()"
+        @drop="handleFileDrop($event)"
+        @dragover="handleFileDragOver($event)"
+        @dragend="handleFileDragEnd($event)"
+      />
       <v-btn @click="search()">Search</v-btn>
     </div>
     <div id="image-search-image-container">
-      <img ref="image" />
+      <img ref="image" @load="handleImageLoad()" />
     </div>
     <div id="image-search-results">
       <div id="image-search-progress" v-if="state === State.RUNNING">
@@ -37,8 +45,23 @@
   margin-top: 16px;
   overflow-y: scroll;
 }
+#image-search-tab-buttons {
+  display: flex;
+  align-items: center;
+}
+#image-search-tab-file-input {
+  flex: 1;
+}
 #image-search-image-container img {
   max-width: 100%;
+}
+#image-search-results {
+  display: flex;
+  justify-content: center;
+}
+#image-search-tab-table {
+  overflow-y: auto;
+  margin-bottom: 32px;
 }
 </style>
 
@@ -79,20 +102,63 @@ export default class ImageSearchTab extends Vue {
     if (fileInput.files === null || fileInput.files.length === 0) {
       return;
     }
+    this.loadFile(fileInput.files[0]);
+  }
 
+  private loadFile(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
-      const image = this.$refs.image as HTMLImageElement;
-      image.src = reader.result;
-      image.onload = () => {
-        this.cropper = new Cropper(image, {
-          autoCrop: false,
-          viewMode: 1,
-          zoomable: false,
-        });
-      };
+      this.setImageSrc(reader.result);
     };
-    reader.readAsDataURL(fileInput.files[0]);
+    reader.readAsDataURL(file);
+  }
+
+  private handleFileDrop(event: DragEvent) {
+    event.preventDefault();
+    const dataTransfer = event.dataTransfer;
+    if (!dataTransfer || !dataTransfer.items || dataTransfer.items.length === 0) {
+      return;
+    }
+    dataTransfer.items[0].getAsString((uri) => {
+      this.setImageSrc(uri);
+    });
+  }
+
+  private handleFileDragOver(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  private handleFileDragEnd(event: DragEvent) {
+    const dataTransfer = event.dataTransfer;
+    if (dataTransfer.items) {
+      for (let i = 0; i < dataTransfer.items.length; i++) {
+        dataTransfer.items.remove(i);
+      }
+    }
+  }
+
+  private setImageSrc(imageSrc: string) {
+    if (this.cropper === null) {
+      const image = this.$refs.image as HTMLImageElement;
+      image.src = imageSrc;
+    } else {
+      this.cropper.replace(imageSrc);
+    }
+    this.results = [];
+  }
+
+  private handleImageLoad() {
+    if (this.cropper === null) {
+      const image = this.$refs.image as HTMLImageElement;
+      this.cropper = new Cropper(image, {
+        autoCrop: false,
+        viewMode: 1,
+        zoomable: false,
+      });
+    } else {
+      this.cropper.reset();
+      this.cropper.clear();
+    }
   }
 
   private search() {
@@ -102,9 +168,15 @@ export default class ImageSearchTab extends Vue {
     const canvas = this.cropper.getCroppedCanvas();
     const croppedImage = this.$refs.croppedImage as HTMLImageElement;
     const dataUrl = canvas.toDataURL();
+    const matches = dataUrl.match(/^data:image\/[^;]+;base64,(.*)$/);
+    if (matches === null || matches.length < 2) {
+      this.$emit("error", "Failed to generate cropped image.");
+      return;
+    }
+    const base64image = matches[1];
 
     const request: RunWebDetectionRequest = {
-      imageContent: dataUrl,
+      imageContent: base64image,
     };
     this.state = State.RUNNING;
     apiFetch<RunWebDetectionResponse>(RUN_WEB_DETECTION_URL, request).then((response) => {
