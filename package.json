@@ -13,11 +13,13 @@
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",
+    "@types/cropperjs": "^1.1.0",
     "@types/mocha": "^2.2.44",
     "@types/node": "^8.0.47",
     "@types/rewire": "^2.5.28",
     "@types/seedrandom": "^2.4.27",
     "chai": "^4.1.2",
+    "cropperjs": "^1.2.1",
     "css-loader": "^0.28.7",
     "mocha": "^4.0.1",
     "rewire": "^2.5.2",
