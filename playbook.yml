@@ -43,7 +43,7 @@
     become: true
 
   - name: install Collective.jl
-    command: julia -e 'Pkg.clone("https://github.com/rdeits/Collective.jl.git")' creates=/home/ubuntu/.julia/v0.5/Collective/**
+    command: julia -e 'Pkg.clone("https://github.com/obijywk/Collective.jl.git")' creates=/home/ubuntu/.julia/v0.5/Collective/**
 
   # Set up Nutrimatic
 
