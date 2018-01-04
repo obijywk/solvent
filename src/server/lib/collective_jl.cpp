@@ -131,6 +131,7 @@ Value Analyze(const CallbackInfo& callback_info) {
 
 Object Init(Env env, Object exports) {
   jl_eval_string("using Collective");
+  jl_eval_string("gc()");
   jl_module_t* julia_collective = (jl_module_t*) jl_eval_string("Collective");
   julia_corpus_function = jl_get_function(julia_collective, "Corpus");
   julia_analyze_function = jl_get_function(julia_collective, "analyze");
