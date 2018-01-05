@@ -79,6 +79,8 @@ import {
 } from "../api/run_web_detection";
 import { apiFetch } from "../client/api_fetch";
 
+import { ErrorResponse } from "../api/error_response";
+
 enum State {
   RUNNING,
   RESULTS,
@@ -105,14 +107,6 @@ export default class ImageSearchTab extends Vue {
     this.loadFile(fileInput.files[0]);
   }
 
-  private loadFile(file: File) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.setImageSrc(reader.result);
-    };
-    reader.readAsDataURL(file);
-  }
-
   private handleFileDrop(event: DragEvent) {
     event.preventDefault();
     const dataTransfer = event.dataTransfer;
@@ -120,7 +114,19 @@ export default class ImageSearchTab extends Vue {
       return;
     }
     dataTransfer.items[0].getAsString((uri) => {
-      this.setImageSrc(uri);
+      fetch("/api/http_fetch/" + window.btoa(uri)).then((response) => {
+        if (!response.ok) {
+          response.json().then((errorResponse: ErrorResponse) => {
+            const errorDetails = [];
+            for (const error of errorResponse.errors) {
+              errorDetails.push(error.detail);
+            }
+            this.$emit("error", errorDetails.join(", "));
+          });
+        } else {
+          response.blob().then(this.loadFile);
+        }
+      });
     });
   }
 
@@ -135,6 +141,14 @@ export default class ImageSearchTab extends Vue {
         dataTransfer.items.remove(i);
       }
     }
+  }
+
+  private loadFile(file: Blob) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.setImageSrc(reader.result);
+    };
+    reader.readAsDataURL(file);
   }
 
   private setImageSrc(imageSrc: string) {
