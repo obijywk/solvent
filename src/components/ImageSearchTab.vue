@@ -23,14 +23,26 @@
       </div>
       <v-data-table
         :headers="headers"
-        :items="results"
+        :items="entityResults"
         hide-actions
-        id="image-search-tab-table"
+        id="image-search-entity-table"
         v-if="state === State.RESULTS"
       >
         <template slot="items" slot-scope="props">
           <td>{{ props.item.score }}</td>
           <td>{{ props.item.description }}</td>
+        </template>
+      </v-data-table>
+      <v-data-table
+        :items="pageResults"
+        hide-headers
+        hide-actions
+        id="image-search-page-table"
+        v-if="state === State.RESULTS"
+        class="hidden-sm-and-down"
+      >
+        <template slot="items" slot-scope="props">
+          <td><a :href="props.item" target="_blank">{{ props.item }}</a></td>
         </template>
       </v-data-table>
     </div>
@@ -63,10 +75,13 @@
 #image-search-results {
   display: flex;
   justify-content: center;
-}
-#image-search-tab-table {
-  overflow-y: auto;
   margin-bottom: 32px;
+}
+#image-search-entity-table {
+  overflow-y: auto;
+}
+#image-search-page-table {
+  overflow-y: auto;
 }
 </style>
 
@@ -77,10 +92,10 @@ import { Component } from "vue-property-decorator";
 import * as Cropper from "cropperjs";
 
 import {
+  EntityResult,
   RUN_WEB_DETECTION_URL,
   RunWebDetectionRequest,
   RunWebDetectionResponse,
-  RunWebDetectionResult,
 } from "../api/run_web_detection";
 import { apiFetch } from "../client/api_fetch";
 
@@ -96,7 +111,8 @@ const MAX_IMAGE_SIZE = 800;
 @Component
 export default class ImageSearchTab extends Vue {
   private cropper: Cropper | null = null;
-  private results: RunWebDetectionResult[] = [];
+  private entityResults: EntityResult[] = [];
+  private pageResults: string[] = [];
 
   private State = State;
   private state: State = State.RESULTS;
@@ -165,7 +181,8 @@ export default class ImageSearchTab extends Vue {
     } else {
       this.cropper.replace(imageSrc);
     }
-    this.results = [];
+    this.entityResults = [];
+    this.pageResults = [];
   }
 
   private handleImageLoad() {
@@ -219,10 +236,12 @@ export default class ImageSearchTab extends Vue {
     };
     this.state = State.RUNNING;
     apiFetch<RunWebDetectionResponse>(RUN_WEB_DETECTION_URL, request).then((response) => {
-      this.results = response.results;
+      this.entityResults = response.entityResults;
+      this.pageResults = response.pageResults;
       this.state = State.RESULTS;
     }).catch((err: Error) => {
-      this.results = [];
+      this.entityResults = [];
+      this.pageResults = [];
       this.state = State.RESULTS;
       this.$emit("error", err.message);
     });

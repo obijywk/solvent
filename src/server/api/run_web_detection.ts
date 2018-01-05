@@ -8,10 +8,10 @@ const vision = require("@google-cloud/vision");
 const visionClient = new vision.ImageAnnotatorClient();
 
 import {
+  EntityResult,
   RUN_WEB_DETECTION_URL,
   RunWebDetectionRequest,
   RunWebDetectionResponse,
-  RunWebDetectionResult,
 } from "../../api/run_web_detection";
 
 export function install(app: Express) {
@@ -30,13 +30,20 @@ export function install(app: Express) {
     };
     visionClient.annotateImage(request).then((response: any) => {
       const runWebDetectionResponse = new RunWebDetectionResponse();
-      runWebDetectionResponse.results = [];
+
+      runWebDetectionResponse.entityResults = [];
       for (const webEntity of response[0].webDetection.webEntities) {
-        runWebDetectionResponse.results.push({
+        runWebDetectionResponse.entityResults.push({
           description: webEntity.description,
           score: webEntity.score,
         });
       }
+
+      runWebDetectionResponse.pageResults = [];
+      for (const webPage of response[0].webDetection.pagesWithMatchingImages) {
+        runWebDetectionResponse.pageResults.push(webPage.url);
+      }
+
       res.send(runWebDetectionResponse);
     }).catch((err: Error) => {
       internalServerError(res, err.toString());
