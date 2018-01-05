@@ -1,14 +1,16 @@
 <template>
-  <div id="image-search-tab-container">
+  <div
+    id="image-search-tab-container"
+    @drop="handleFileDrop($event)"
+    @dragover="handleFileDragOver($event)"
+    @dragend="handleFileDragEnd($event)"
+  >
     <div id="image-search-tab-buttons">
       <input
         type="file"
         id="image-search-tab-file-input"
         ref="fileInput"
         @change="handleFileInputChange()"
-        @drop="handleFileDrop($event)"
-        @dragover="handleFileDragOver($event)"
-        @dragend="handleFileDragEnd($event)"
       />
       <v-btn @click="search()">Search</v-btn>
     </div>
@@ -43,7 +45,6 @@
   margin-left: 16px;
   margin-right: 16px;
   margin-top: 16px;
-  overflow-y: scroll;
 }
 #image-search-tab-buttons {
   display: flex;
@@ -51,6 +52,10 @@
 }
 #image-search-tab-file-input {
   flex: 1;
+}
+#image-search-image-container {
+  max-width: 100%;
+  max-height: 50%;
 }
 #image-search-image-container img {
   max-width: 100%;
