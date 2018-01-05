@@ -184,7 +184,10 @@ export default class ImageSearchTab extends Vue {
     if (this.cropper === null) {
       return;
     }
-    const canvas = this.cropper.getCroppedCanvas();
+    const canvas = this.cropper.getCroppedCanvas({
+      maxWidth: 800,
+      maxHeight: 800,
+    });
     const croppedImage = this.$refs.croppedImage as HTMLImageElement;
     const dataUrl = canvas.toDataURL();
     const matches = dataUrl.match(/^data:image\/[^;]+;base64,(.*)$/);
