@@ -91,6 +91,8 @@ enum State {
   RESULTS,
 }
 
+const MAX_IMAGE_SIZE = 800;
+
 @Component
 export default class ImageSearchTab extends Vue {
   private cropper: Cropper | null = null;
@@ -184,11 +186,26 @@ export default class ImageSearchTab extends Vue {
     if (this.cropper === null) {
       return;
     }
-    const canvas = this.cropper.getCroppedCanvas({
-      maxHeight: 800,
-      maxWidth: 800,
-    });
-    const croppedImage = this.$refs.croppedImage as HTMLImageElement;
+    let canvas = this.cropper.getCroppedCanvas();
+
+    if (canvas.width > MAX_IMAGE_SIZE || canvas.height > MAX_IMAGE_SIZE) {
+      const smallCanvas = document.createElement("canvas");
+      const smallCtx = smallCanvas.getContext("2d");
+      if (smallCtx === null) {
+        return;
+      }
+      let ratio: number;
+      if (canvas.width > canvas.height) {
+        ratio = MAX_IMAGE_SIZE / canvas.width;
+      } else {
+        ratio = MAX_IMAGE_SIZE / canvas.height;
+      }
+      smallCanvas.width = canvas.width * ratio;
+      smallCanvas.height = canvas.height * ratio;
+      smallCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, smallCanvas.width, smallCanvas.height);
+      canvas = smallCanvas;
+    }
+
     const dataUrl = canvas.toDataURL();
     const matches = dataUrl.match(/^data:image\/[^;]+;base64,(.*)$/);
     if (matches === null || matches.length < 2) {
