@@ -61,6 +61,9 @@
           <v-card>
             <binary-picker-component @addLetter="addLetter($event)" />
           </v-card>
+          <v-card>
+            <numbers-picker-component @addLetter="addLetter($event)" />
+          </v-card>
         </v-layout>
       </v-container>
       <v-tabs class="hidden-md-and-up">
@@ -69,6 +72,7 @@
           <v-tabs-item href="#morse-tab">Morse</v-tabs-item>
           <v-tabs-item href="#semaphore-tab">Semaphore</v-tabs-item>
           <v-tabs-item href="#binary-tab">Binary</v-tabs-item>
+          <v-tabs-item href="#numbers-tab">Numbers</v-tabs-item>
           <v-tabs-slider></v-tabs-slider>
         </v-tabs-bar>
         <v-tabs-items>
@@ -83,6 +87,9 @@
           </v-tabs-content>
           <v-tabs-content id="binary-tab" lazy>
             <binary-picker-component @addLetter="addLetter($event)" />
+          </v-tabs-content>
+          <v-tabs-content id="numbers-tab" lazy>
+            <numbers-picker-component @addLetter="addLetter($event)" />
           </v-tabs-content>
         </v-tabs-items>
       </v-tabs>
@@ -128,6 +135,7 @@ import { Component, Prop } from "vue-property-decorator";
 import BinaryPickerComponent from "./BinaryPicker.vue";
 import BraillePickerComponent from "./BraillePicker.vue";
 import MorsePickerComponent from "./MorsePicker.vue";
+import NumbersPickerComponent from "./NumbersPicker.vue";
 import SemaphorePickerComponent from "./SemaphorePicker.vue";
 
 @Component({
@@ -135,6 +143,7 @@ import SemaphorePickerComponent from "./SemaphorePicker.vue";
     BinaryPickerComponent,
     BraillePickerComponent,
     MorsePickerComponent,
+    NumbersPickerComponent,
     SemaphorePickerComponent,
   },
 })
