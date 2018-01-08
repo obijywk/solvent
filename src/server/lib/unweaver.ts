@@ -41,6 +41,16 @@ type Branch = TrieMarker[];
 function branchCost(branch: Branch): number {
   let cost: number = 0;
   for (const trieMarker of branch) {
+    if (trieMarker.node.value !== null) {
+      cost += -trieMarker.node.value;
+    }
+  }
+  return cost;
+}
+
+function branchDescendantCost(branch: Branch): number {
+  let cost: number = 0;
+  for (const trieMarker of branch) {
     if (trieMarker.node.minDescendantValue !== null) {
       cost += trieMarker.node.minDescendantValue;
     }
@@ -78,7 +88,7 @@ class BranchSet {
 
   public prune(maxSize: number) {
     if (this.branchList.length > maxSize) {
-      this.branchList = _.sortBy(this.branchList, (branch) => -branchCost(branch));
+      this.branchList = _.sortBy(this.branchList, (branch) => -branchDescendantCost(branch));
       this.branchList.splice(maxSize);
       this.branchKeys = {};
       for (const branch of this.branchList) {
