@@ -4,6 +4,7 @@
       <v-tabs-bar class="blue-grey lighten-4">
         <v-tabs-item href="#codes-tab">Codes</v-tabs-item>
         <v-tabs-item href="#ciphers-tab">Ciphers</v-tabs-item>
+        <v-tabs-item href="#unweaver-tab">Unweaver</v-tabs-item>
         <v-tabs-item href="#clues-tab">Clues</v-tabs-item>
         <v-tabs-item href="#collective-jl-tab">Collective.jl</v-tabs-item>
         <v-tabs-item href="#nutrimatic-tab">Nutrimatic</v-tabs-item>
@@ -16,6 +17,9 @@
         </v-tabs-content>
         <v-tabs-content id="ciphers-tab" class="full-height" lazy>
           <ciphers-tab-component @error="handleError($event)" />
+        </v-tabs-content>
+        <v-tabs-content id="unweaver-tab" class="full-height" lazy>
+          <unweaver-tab-component @error="handleError($event)" />
         </v-tabs-content>
         <v-tabs-content id="clues-tab" class="full-height" lazy>
           <clues-tab-component @error="handleError($event)" />
@@ -69,6 +73,7 @@ import CodesTabComponent from "./CodesTab.vue";
 import CollectiveJlTabComponent from "./CollectiveJlTab.vue";
 import ImageSearchTabComponent from "./ImageSearchTab.vue";
 import NutrimaticTabComponent from "./NutrimaticTab.vue";
+import UnweaverTabComponent from "./UnweaverTab.vue";
 
 @Component({
   components: {
@@ -78,6 +83,7 @@ import NutrimaticTabComponent from "./NutrimaticTab.vue";
     CollectiveJlTabComponent,
     ImageSearchTabComponent,
     NutrimaticTabComponent,
+    UnweaverTabComponent,
   },
 })
 export default class App extends Vue {

@@ -17,6 +17,7 @@ import * as scoreEnglish from "./api/score_english";
 import * as searchClues from "./api/search_clues";
 import * as searchNutrimatic from "./api/search_nutrimatic";
 import * as solveCipher from "./api/solve_cipher";
+import * as unweave from "./api/unweave";
 
 const debug = debugCreator("solvent");
 
@@ -34,6 +35,7 @@ scoreEnglish.install(app);
 searchClues.install(app);
 searchNutrimatic.install(app);
 solveCipher.install(app);
+unweave.install(app);
 
 app.get("/api/http_fetch/:base64url*", (req, res) => {
   let getUrl: url.Url;
