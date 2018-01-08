@@ -7,7 +7,7 @@ import * as collectiveJl from "./collective_jl";
 
 describe("collective_jl", () => {
   before(function() {
-    this.timeout(10000);
+    this.timeout(30000);
     return collectiveJl.initialized;
   });
 
