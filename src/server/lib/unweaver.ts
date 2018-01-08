@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import { setImmediate } from "timers";
 
 import * as fitnessStats from "./fitness_stats";
-import { SolutionCostSolver } from "./solution_cost_solver";
 import { ValueTrieNode } from "./value_trie";
 
 export class Result {
@@ -12,120 +11,143 @@ export class Result {
     public cost: number) { }
 }
 
-class Letter {
-  constructor(
-    public position: number,
-    public letter: string) {
-  }
+interface IUnweaverOptions {
+  maxResults: number;
+  stateSpaceLimit: number;
 }
 
-class Word {
-  constructor(
-    public letters: Letter[] = [],
-    public cost: number = 0) {
+class TrieMarker {
+  public node: ValueTrieNode<number>;
+  public word: string;
+
+  constructor(node: ValueTrieNode<number>) {
+    this.node = node;
+    this.word = "";
   }
 
-  public asText(): string {
-    return _.map(this.letters, "letter").join("");
-  }
-}
-
-class Step {
-  constructor(
-    public prefix: Word,
-    public prefixTrieNode: ValueTrieNode<number>,
-    public letters: Letter[],
-    public lettersStart: number,
-    public words: Word[]) {
-  }
-}
-
-export function unweave(text: string, numWords: number | null = null): Promise<Result[]> {
-  return new Promise((resolve) => {
-    const initialLetters = [];
-    for (let i = 0; i < text.length; i++) {
-      initialLetters.push(new Letter(i, text[i]));
+  public tryAdvance(c: string): TrieMarker | null {
+    const childNode = this.node.children[c];
+    if (!childNode) {
+      return null;
     }
-    const initialSolution = initialLetters.map(
-      (letter) => new Word([letter], -fitnessStats.wordScore(letter.letter)));
-    const solver = new SolutionCostSolver<Word[]>(
-      initialSolution,
-      (words) => _.sumBy(words, "cost"),
-      { maxResults: 3 });
+    const newTrieMarker = new TrieMarker(childNode);
+    newTrieMarker.word = this.word + c;
+    return newTrieMarker;
+  }
+}
 
-    const wordStepQueue: Step[] = [new Step(new Word(), fitnessStats.wordLogProbsTrie, initialLetters, 0, [])];
-    const prefixStepQueue: Step[] = [];
+type Branch = TrieMarker[];
+
+function branchCost(branch: Branch): number {
+  let cost: number = 0;
+  for (const trieMarker of branch) {
+    if (trieMarker.node.minDescendantValue !== null) {
+      cost += trieMarker.node.minDescendantValue;
+    }
+  }
+  return cost;
+}
+
+function isBranchComplete(branch: Branch, numWords: number): boolean {
+  if (branch.length < numWords) {
+    return false;
+  }
+  for (const trieMarker of branch) {
+    if (trieMarker.node.value === null) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function branchKey(branch: Branch): string {
+  return _.map(branch, "word").sort().join(",");
+}
+
+class BranchSet {
+  public branchList: Branch[] = [];
+  public branchKeys: {[key: string]: boolean} = {};
+
+  public add(branch: Branch) {
+    const key = branchKey(branch);
+    if (!_.has(this.branchKeys, key)) {
+      this.branchList.push(branch);
+      this.branchKeys[key] = true;
+    }
+  }
+
+  public prune(maxSize: number) {
+    if (this.branchList.length > maxSize) {
+      this.branchList = _.sortBy(this.branchList, (branch) => -branchCost(branch));
+      this.branchList.splice(maxSize);
+      this.branchKeys = {};
+      for (const branch of this.branchList) {
+        this.branchKeys[branchKey(branch)] = true;
+      }
+    }
+  }
+}
+
+export function unweave(
+    text: string,
+    numWords: number,
+    options: Partial<IUnweaverOptions> = {}): Promise<Result[]> {
+  text = text.toUpperCase().replace(/[^A-Z]/g, "");
+  const fullOptions: IUnweaverOptions = {
+    maxResults: 100,
+    stateSpaceLimit: 10000,
+    ...options,
+  };
+  return new Promise((resolve) => {
+    let branches = new BranchSet();
+    branches.add([]);
+
+    let textIndex: number = 0;
+
     function runStep() {
-      let step: Step;
-      if (wordStepQueue.length === 0 && prefixStepQueue.length === 0) {
-        resolve(solver.getResults().map((result) => new Result(
-          result.solution.map((word) => word.asText()),
-          result.cost)));
-        return;
-      } else if (wordStepQueue.length > 0 && wordStepQueue[wordStepQueue.length - 1].letters.length === 0) {
-        step = wordStepQueue.pop() as Step;
-      } else if (prefixStepQueue.length > 0) {
-        step = prefixStepQueue.pop() as Step;
-      } else if (wordStepQueue.length > 0) {
-        step = wordStepQueue.pop() as Step;
+      const c = text[textIndex];
+
+      const newBranches = new BranchSet();
+      for (const branch of branches.branchList) {
+        for (let i = 0; i < branch.length; i++) {
+          const trieMarker = branch[i];
+          const nextTrieMarker = trieMarker.tryAdvance(c);
+          if (nextTrieMarker) {
+            const newBranch = branch.slice();
+            newBranch[i] = nextTrieMarker;
+            newBranches.add(newBranch);
+          }
+        }
+        if (branch.length < numWords) {
+          const trieMarker = new TrieMarker(fitnessStats.wordLogProbsTrie).tryAdvance(c);
+          if (trieMarker) {
+            branch.push(trieMarker);
+            newBranches.add(branch);
+          }
+        }
+      }
+      branches = newBranches;
+      branches.prune(fullOptions.stateSpaceLimit);
+
+      textIndex++;
+      if (textIndex === text.length) {
+        let results: Result[] = [];
+        for (const branch of branches.branchList) {
+          if (!isBranchComplete(branch, numWords)) {
+            continue;
+          }
+          const words = _.map(branch, "word");
+          const cost = branchCost(branch);
+          results.push(new Result(words, cost));
+        }
+        results = _.sortBy(results, (result) => result.cost);
+        results.splice(fullOptions.maxResults);
+        resolve(results);
+      } else if (branches.branchList.length === 0) {
+        resolve([]);
       } else {
-        // Should be unreachable.
-        return;
-      }
-
-      const wordsCost = _.sumBy(step.words, "cost");
-      const results = solver.getResults();
-      if (wordsCost > results[results.length - 1].cost) {
         setImmediate(runStep);
-        return;
       }
-
-      let lettersIndexLimit = step.letters.length;
-      if (step.prefix.letters.length === 0) {
-        if (step.letters.length === 0) {
-          if (numWords !== null && step.words.length !== numWords) {
-            setImmediate(runStep);
-            return;
-          }
-          const solution = _.sortBy(step.words, (word) => word.letters[0].position);
-          solver.addResult(solution);
-        } else if (numWords !== null && step.words.length >= numWords) {
-          setImmediate(runStep);
-          return;
-        } else {
-          lettersIndexLimit = step.lettersStart + 1;
-        }
-      }
-
-      for (let lettersIndex = step.lettersStart; lettersIndex < lettersIndexLimit; lettersIndex++) {
-        const letter = step.letters[lettersIndex];
-        const childNode = step.prefixTrieNode.children[letter.letter];
-        if (childNode !== undefined) {
-          const word = new Word(step.prefix.letters.concat([letter]));
-          const nextLetters = _.clone(step.letters);
-          nextLetters.splice(lettersIndex, 1);
-          if (childNode.value !== null) {
-            word.cost = -childNode.value;
-            const nextWords = step.words.concat([word]);
-            const nextWordStep = new Step(new Word(), fitnessStats.wordLogProbsTrie, nextLetters, 0, nextWords);
-            const nextWordStepIndex = _.sortedLastIndexBy(
-              wordStepQueue,
-              nextWordStep,
-              (s) => {
-                let score = -s.letters.length;
-                for (const sWord of s.words) {
-                  score += (1 / sWord.cost);
-                }
-                return score;
-              });
-            wordStepQueue.splice(nextWordStepIndex, 0, nextWordStep);
-          }
-          const nextStep = new Step(word, childNode, nextLetters, lettersIndex, step.words);
-          prefixStepQueue.push(nextStep);
-        }
-      }
-
-      setImmediate(runStep);
     }
     setImmediate(runStep);
   });

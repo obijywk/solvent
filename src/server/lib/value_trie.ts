@@ -1,10 +1,14 @@
-export class ValueTrieNode<V> {
+export class ValueTrieNode<V extends number> {
   public constructor(
     public value: V | null = null,
+    public minDescendantValue: V | null = null,
     public children: { [key: string]: ValueTrieNode<V> } = {}) {
   }
 
   public insert(path: string, value: V) {
+    if (this.minDescendantValue === null || this.minDescendantValue > value) {
+      this.minDescendantValue = value;
+    }
     if (path.length === 0) {
       if (this.value !== null) {
         throw new Error("Duplicate ValueTrieNode insertion");
