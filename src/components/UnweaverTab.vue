@@ -159,7 +159,7 @@ enum State {
 @Component
 export default class UnweaverTab extends Vue {
   private text: string = "";
-  private numWords: string = "10";
+  private numWords: string = "2";
   private stateSpaceLimit: number = 10000;
   private maxResults: number = 100;
   private results: UnweaveResult[] = [];
