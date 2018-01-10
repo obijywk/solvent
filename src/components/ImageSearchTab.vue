@@ -12,6 +12,9 @@
         ref="fileInput"
         @change="handleFileInputChange()"
       />
+      <div class="hidden-sm-and-down">
+        Or drag an image here from another tab.
+      </div>
       <v-btn @click="search()">Search</v-btn>
     </div>
     <div id="image-search-image-container">
