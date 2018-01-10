@@ -1,6 +1,6 @@
 <template>
   <v-btn flat @click="click" class="numbers-button">
-    <span>{{ letter }}</span>
+    <span>{{ displayLetter() }}</span>
     <span>{{ naturalNumber() }}</span>
     <span>{{ asciiNumber() }}</span>
   </v-btn>
@@ -9,8 +9,8 @@
 <style>
 .numbers-button {
   margin: 0;
-  min-width: 28px;
-  min-height: 128px;
+  min-width: 36px;
+  min-height: 85.33px;
   flex: 1;
 }
 .numbers-button .btn__content {
@@ -30,7 +30,17 @@ export default class NumbersButton extends Vue {
   @Prop()
   private letter: string;
 
+  private displayLetter(): string {
+    if (this.letter === " ") {
+      return "_";
+    }
+    return this.letter;
+  }
+
   private naturalNumber(): string {
+    if (this.letter === " ") {
+      return "00";
+    }
     return (this.letter.charCodeAt(0) - 64).toString();
   }
 

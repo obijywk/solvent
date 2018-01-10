@@ -123,6 +123,9 @@
   margin-top: auto;
   margin-bottom: 16px;
 }
+#codes-tab-picker-cards {
+  justify-content: center;
+}
 #codes-tab-picker-cards > .card {
   margin: 16px;
 }

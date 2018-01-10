@@ -2,7 +2,7 @@
   <div id="numbers-grid-container">
     <div id="numbers-row">
       <numbers-button-component
-        v-for="letter in ['A','B','C','D','E','F','G','H','I','J','K','L','M']"
+        v-for="letter in ['A','B','C','D','E','F','G','H','I']"
         :key="letter"
         :letter="letter"
         @addLetter="addLetter($event)"
@@ -10,7 +10,15 @@
     </div>
     <div id="numbers-row">
       <numbers-button-component
-        v-for="letter in ['Z','Y','X','W','V','U','T','S','R','Q','P','O','N']"
+        v-for="letter in ['J','K','L','M','N','O','P','Q','R']"
+        :key="letter"
+        :letter="letter"
+        @addLetter="addLetter($event)"
+      />
+    </div>
+    <div id="numbers-row">
+      <numbers-button-component
+        v-for="letter in ['S','T','U','V','W','X','Y','Z',' ']"
         :key="letter"
         :letter="letter"
         @addLetter="addLetter($event)"
