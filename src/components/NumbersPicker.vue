@@ -45,6 +45,8 @@ import { Component, Prop } from "vue-property-decorator";
 
 import NumbersButtonComponent from "./NumbersButton.vue";
 
+declare const gtag: any;
+
 @Component({
   components: {
     NumbersButtonComponent,
@@ -53,6 +55,7 @@ import NumbersButtonComponent from "./NumbersButton.vue";
 export default class NumbersPicker extends Vue {
   private addLetter(letter: string) {
     this.$emit("addLetter", letter);
+    gtag("event", "code_entry_numbers");
   }
 }
 </script>

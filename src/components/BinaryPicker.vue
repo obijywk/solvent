@@ -52,6 +52,8 @@ import { Component, Prop } from "vue-property-decorator";
 
 import BinaryButtonComponent from "./BinaryButton.vue";
 
+declare const gtag: any;
+
 @Component({
   components: {
     BinaryButtonComponent,
@@ -60,6 +62,7 @@ import BinaryButtonComponent from "./BinaryButton.vue";
 export default class BinaryPicker extends Vue {
   private addLetter(letter: string) {
     this.$emit("addLetter", letter);
+    gtag("event", "code_entry_binary");
   }
 }
 </script>

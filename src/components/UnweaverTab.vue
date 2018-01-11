@@ -150,6 +150,8 @@ import {
 } from "../api/unweave";
 import { apiFetch } from "../client/api_fetch";
 
+declare const gtag: any;
+
 enum State {
   INSTRUCTIONS,
   RUNNING,
@@ -205,6 +207,7 @@ export default class UnweaverTab extends Vue {
       this.state = State.INSTRUCTIONS;
       this.$emit("error", err.message);
     });
+    gtag("event", "unweave");
   }
 }
 </script>

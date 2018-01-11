@@ -104,6 +104,8 @@ import { apiFetch } from "../client/api_fetch";
 
 import { ErrorResponse } from "../api/error_response";
 
+declare const gtag: any;
+
 enum State {
   RUNNING,
   RESULTS,
@@ -131,6 +133,7 @@ export default class ImageSearchTab extends Vue {
       return;
     }
     this.loadFile(fileInput.files[0]);
+    gtag("event", "image_search_file_input");
   }
 
   private handleFileDrop(event: DragEvent) {
@@ -151,6 +154,7 @@ export default class ImageSearchTab extends Vue {
           });
         } else {
           response.blob().then(this.loadFile);
+          gtag("event", "image_search_drag");
         }
       });
     });
@@ -248,6 +252,7 @@ export default class ImageSearchTab extends Vue {
       this.state = State.RESULTS;
       this.$emit("error", err.message);
     });
+    gtag("event", "image_search");
   }
 }
 </script>

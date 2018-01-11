@@ -61,6 +61,8 @@
 import Vue from "vue";
 import { Component, Provide } from "vue-property-decorator";
 
+declare const gtag: any;
+
 class FlagPosition {
   public selected: boolean = false;
   public previouslySelected: boolean = false;
@@ -158,6 +160,7 @@ export default class SemaphorePicker extends Vue {
     const letter = SEMAPHORE_TABLE[pair.key()];
     if (letter) {
       this.$emit("addLetter", letter);
+      gtag("event", "code_entry_semaphore");
     }
 
     this.updateSelections();

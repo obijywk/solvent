@@ -39,6 +39,8 @@ import { Component, Prop } from "vue-property-decorator";
 import { SOLVE_CIPHER_URL, SolveCipherRequest, SolveCipherResponse, SolveCipherResult } from "../api/solve_cipher";
 import { apiFetch } from "../client/api_fetch";
 
+declare const gtag: any;
+
 @Component
 export default class CipherSolver extends Vue {
   @Prop()
@@ -67,6 +69,7 @@ export default class CipherSolver extends Vue {
       this.solving = false;
       this.$emit("error", err.message);
     });
+    gtag("event", "solve_cipher");
   }
 }
 </script>

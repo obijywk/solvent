@@ -129,6 +129,8 @@ import { Component, Prop } from "vue-property-decorator";
 
 import MorseButtonComponent from "./MorseButton.vue";
 
+declare const gtag: any;
+
 @Component({
   components: {
     MorseButtonComponent,
@@ -137,6 +139,7 @@ import MorseButtonComponent from "./MorseButton.vue";
 export default class MorsePicker extends Vue {
   private addLetter(letter: string) {
     this.$emit("addLetter", letter);
+    gtag("event", "code_entry_morse");
   }
 }
 </script>

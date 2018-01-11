@@ -107,6 +107,8 @@ import {
 } from "../api/analyze_with_collective_jl";
 import { apiFetch } from "../client/api_fetch";
 
+declare const gtag: any;
+
 @Component
 export default class CollectiveJlTab extends Vue {
   private text: string = "";
@@ -141,6 +143,7 @@ export default class CollectiveJlTab extends Vue {
     }).catch((err: Error) => {
       this.$emit("error", err.message);
     });
+    gtag("event", "analyze_with_collective_jl");
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-app id="solvent" class="full-height">
-    <v-tabs class="full-height tabs-container">
+    <v-tabs class="full-height tabs-container" @input="handleTabsInput($event)">
       <v-tabs-bar class="blue-grey lighten-4">
         <v-tabs-item href="#codes-tab">Codes</v-tabs-item>
         <v-tabs-item href="#ciphers-tab">Ciphers</v-tabs-item>
@@ -75,6 +75,8 @@ import ImageSearchTabComponent from "./ImageSearchTab.vue";
 import NutrimaticTabComponent from "./NutrimaticTab.vue";
 import UnweaverTabComponent from "./UnweaverTab.vue";
 
+declare const gtag: any;
+
 @Component({
   components: {
     CiphersTabComponent,
@@ -93,6 +95,12 @@ export default class App extends Vue {
   private handleError(errorMessage: string) {
     this.errorMessage = errorMessage;
     this.showErrorSnackbar = true;
+  }
+
+  private handleTabsInput(tabId: string) {
+    gtag("event", "screen_view", {
+      screen_name: tabId,
+    });
   }
 }
 </script>

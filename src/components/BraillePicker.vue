@@ -47,6 +47,8 @@ import { Component, Prop } from "vue-property-decorator";
 
 import BrailleButtonComponent from "./BrailleButton.vue";
 
+declare const gtag: any;
+
 @Component({
   components: {
     BrailleButtonComponent,
@@ -55,6 +57,7 @@ import BrailleButtonComponent from "./BrailleButton.vue";
 export default class BraillePicker extends Vue {
   private addLetter(letter: string) {
     this.$emit("addLetter", letter);
+    gtag("event", "code_entry_braille");
   }
 }
 </script>

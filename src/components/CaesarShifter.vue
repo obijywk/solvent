@@ -32,6 +32,8 @@ import { Component, Prop } from "vue-property-decorator";
 
 import { SCORE_ENGLISH_URL, ScoreEnglishRequest, ScoreEnglishResponse } from "../api/score_english";
 
+declare const gtag: any;
+
 @Component
 export default class CaesarShifter extends Vue {
   @Prop()
@@ -58,6 +60,7 @@ export default class CaesarShifter extends Vue {
       this.outputStrings.push(outputString);
     }
     this.getScores();
+    gtag("event", "caesar_shift");
   }
 
   private getScores() {
