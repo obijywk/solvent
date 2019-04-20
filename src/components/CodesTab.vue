@@ -46,9 +46,9 @@
       </v-tooltip>
     </div>
 
-    <div id="codes-tab-pickers">
-      <v-container class="hidden-sm-and-down" fluid grid-list-md>
-        <v-layout row wrap id="codes-tab-picker-cards">
+    <div id="codes-tab-desktop-pickers" class="hidden-sm-and-down">
+      <v-container fluid grid-list-md>
+        <div id="codes-tab-picker-cards">
           <v-card>
             <braille-picker-component @addLetter="addLetter($event)" />
           </v-card>
@@ -64,9 +64,11 @@
           <v-card>
             <numbers-picker-component @addLetter="addLetter($event)" />
           </v-card>
-        </v-layout>
+        </div>
       </v-container>
-      <v-tabs class="hidden-md-and-up">
+    </div>
+    <div id="codes-tab-mobile-pickers" class="hidden-md-and-up">
+      <v-tabs>
         <v-tabs-bar class="blue-grey lighten-4">
           <v-tabs-item href="#braille-tab">Braille</v-tabs-item>
           <v-tabs-item href="#morse-tab">Morse</v-tabs-item>
@@ -119,14 +121,21 @@
   margin-left: 16px;
   margin-right: 16px;
 }
-#codes-tab-pickers {
+#codes-tab-desktop-pickers {
+  margin-top: 16px;
+  margin-bottom: auto;
+}
+#codes-tab-mobile-pickers {
   margin-top: auto;
   margin-bottom: 16px;
 }
 #codes-tab-picker-cards {
-  justify-content: center;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 #codes-tab-picker-cards > .card {
+  flex: 0 0 auto;
   margin: 16px;
 }
 </style>
