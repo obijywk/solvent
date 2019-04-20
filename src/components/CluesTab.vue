@@ -146,6 +146,7 @@
 #clues-results {
   display: flex;
   justify-content: center;
+  overflow-y: auto;
 }
 #clues-tab-table {
   overflow-y: auto;

@@ -195,6 +195,7 @@
 #nutrimatic-results {
   display: flex;
   justify-content: center;
+  overflow-y: auto;
 }
 #nutrimatic-tab-table {
   overflow-y: auto;

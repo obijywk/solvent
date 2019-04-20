@@ -128,6 +128,7 @@
 #unweaver-results {
   display: flex;
   justify-content: center;
+  overflow-y: auto;
 }
 #unweaver-tab-table {
   overflow-y: auto;
