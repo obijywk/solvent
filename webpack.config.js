@@ -2,9 +2,11 @@ var path = require('path')
 var webpack = require('webpack')
 
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+var VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 module.exports = {
   entry: './src/index.ts',
+  mode: 'production',
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
@@ -48,6 +50,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new VueLoaderPlugin()
+  ],
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {

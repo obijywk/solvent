@@ -5,6 +5,7 @@
     "outDir": "./built/",
     "sourceMap": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "noImplicitReturns": true,
     "module": "commonjs",
     "moduleResolution": "node",

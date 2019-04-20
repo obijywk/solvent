@@ -132,9 +132,14 @@ Value Analyze(const CallbackInfo& callback_info) {
 Object Init(Env env, Object exports) {
   jl_eval_string("using Collective");
   jl_eval_string("gc()");
+
   jl_module_t* julia_collective = (jl_module_t*) jl_eval_string("Collective");
-  julia_corpus_function = jl_get_function(julia_collective, "Corpus");
-  julia_analyze_function = jl_get_function(julia_collective, "analyze");
+  if (julia_collective == nullptr) {
+    Error::New(env, "Collective.jl Julia package not found.").ThrowAsJavaScriptException();
+  } else {
+    julia_corpus_function = jl_get_function(julia_collective, "Corpus");
+    julia_analyze_function = jl_get_function(julia_collective, "analyze");
+  }
   julia_getindex_function = jl_get_function(jl_base_module, "getindex");
 
   exports.Set(String::New(env, "buildCorpus"), Function::New(env, BuildCorpus));

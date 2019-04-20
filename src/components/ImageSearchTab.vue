@@ -92,7 +92,7 @@
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
 
-import * as Cropper from "cropperjs";
+const Cropper = require("cropperjs");
 
 import {
   EntityResult,
@@ -166,7 +166,9 @@ export default class ImageSearchTab extends Vue {
 
   private handleFileDragEnd(event: DragEvent) {
     const dataTransfer = event.dataTransfer;
-    if (dataTransfer.items) {
+    if (dataTransfer != null &&
+        dataTransfer.items != null &&
+        dataTransfer.items) {
       for (let i = 0; i < dataTransfer.items.length; i++) {
         dataTransfer.items.remove(i);
       }
@@ -176,7 +178,7 @@ export default class ImageSearchTab extends Vue {
   private loadFile(file: Blob) {
     const reader = new FileReader();
     reader.onload = () => {
-      this.setImageSrc(reader.result);
+      this.setImageSrc(<string>(reader.result));
     };
     reader.readAsDataURL(file);
   }

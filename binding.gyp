@@ -7,7 +7,7 @@
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
-        "/usr/include/julia"
+        "/opt/julia/include/julia"
       ],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
@@ -23,14 +23,14 @@
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
-        "/usr/include/julia"
+        "/opt/julia/include/julia"
       ],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
       ],
       "defines": [
         "NAPI_DISABLE_CPP_EXCEPTIONS",
-        "JULIA_LIB_PATH=\"/usr/lib/x86_64-linux-gnu/libjulia.so\""
+        "JULIA_LIB_PATH=\"/opt/julia/lib/libjulia.so\""
       ]
     },
     {
@@ -39,14 +39,14 @@
         {
           "destination": "build/nutrimatic_src",
           "files": [
-            "/home/ubuntu/nutrimatic/expr-anagram.cpp",
-            "/home/ubuntu/nutrimatic/expr-filter.cpp",
-            "/home/ubuntu/nutrimatic/expr-intersect.cpp",
-            "/home/ubuntu/nutrimatic/expr-optimize.cpp",
-            "/home/ubuntu/nutrimatic/expr-parse.cpp",
-            "/home/ubuntu/nutrimatic/index-reader.cpp",
-            "/home/ubuntu/nutrimatic/index-walker.cpp",
-            "/home/ubuntu/nutrimatic/search-driver.cpp"
+            "/opt/nutrimatic/expr-anagram.cpp",
+            "/opt/nutrimatic/expr-filter.cpp",
+            "/opt/nutrimatic/expr-intersect.cpp",
+            "/opt/nutrimatic/expr-optimize.cpp",
+            "/opt/nutrimatic/expr-parse.cpp",
+            "/opt/nutrimatic/index-reader.cpp",
+            "/opt/nutrimatic/index-walker.cpp",
+            "/opt/nutrimatic/search-driver.cpp"
           ]
         }
       ],
@@ -63,7 +63,7 @@
       ],
       "include_dirs": [
         "<!@(node -p \"require('node-addon-api').include\")",
-        "/home/ubuntu/nutrimatic"
+        "/opt/nutrimatic"
       ],
       "dependencies": [
         "<!(node -p \"require('node-addon-api').gyp\")"
