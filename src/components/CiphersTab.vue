@@ -19,10 +19,10 @@
         <span>Clear text</span>
       </v-tooltip>
       <v-btn @click="caesarShift()">
-        Caesar Shift
+        Caesar
       </v-btn>
       <v-btn @click="substitution()">
-        Solve Substitution
+        Substitution
       </v-btn>
     </div>
 
