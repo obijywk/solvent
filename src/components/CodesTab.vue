@@ -64,6 +64,9 @@
           <v-card>
             <numbers-picker-component @addLetter="addLetter($event)" />
           </v-card>
+          <v-card>
+            <pigpen-picker-component @addLetter="addLetter($event)" />
+          </v-card>
         </div>
       </v-container>
     </div>
@@ -75,6 +78,7 @@
           <v-tabs-item href="#semaphore-tab">Semaphore</v-tabs-item>
           <v-tabs-item href="#binary-tab">Binary</v-tabs-item>
           <v-tabs-item href="#numbers-tab">Numbers</v-tabs-item>
+          <v-tabs-item href="#pigpen-tab">Pigpen</v-tabs-item>
           <v-tabs-slider></v-tabs-slider>
         </v-tabs-bar>
         <v-tabs-items>
@@ -92,6 +96,9 @@
           </v-tabs-content>
           <v-tabs-content id="numbers-tab" lazy>
             <numbers-picker-component @addLetter="addLetter($event)" />
+          </v-tabs-content>
+          <v-tabs-content id="pigpen-tab" lazy>
+            <pigpen-picker-component @addLetter="addLetter($event)" />
           </v-tabs-content>
         </v-tabs-items>
       </v-tabs>
@@ -148,6 +155,7 @@ import BinaryPickerComponent from "./BinaryPicker.vue";
 import BraillePickerComponent from "./BraillePicker.vue";
 import MorsePickerComponent from "./MorsePicker.vue";
 import NumbersPickerComponent from "./NumbersPicker.vue";
+import PigpenPickerComponent from "./PigpenPicker.vue";
 import SemaphorePickerComponent from "./SemaphorePicker.vue";
 
 @Component({
@@ -156,6 +164,7 @@ import SemaphorePickerComponent from "./SemaphorePicker.vue";
     BraillePickerComponent,
     MorsePickerComponent,
     NumbersPickerComponent,
+    PigpenPickerComponent,
     SemaphorePickerComponent,
   },
 })
