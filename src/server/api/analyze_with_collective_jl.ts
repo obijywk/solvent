@@ -24,21 +24,18 @@ export function install(app: Express) {
       analyzeWithCollectiveJlRequest.allowedMisses = 0;
     }
 
-    try {
-      const results = collectiveJl.analyze(
-        analyzeWithCollectiveJlRequest.words,
-        {
-          allowedMisses: analyzeWithCollectiveJlRequest.allowedMisses,
-        });
-
+    collectiveJl.analyze(
+      analyzeWithCollectiveJlRequest.words,
+      {
+        allowedMisses: analyzeWithCollectiveJlRequest.allowedMisses,
+      },
+    ).then((results) => {
       const analyzeWithCollectiveJlResponse = new AnalyzeWithCollectiveJlResponse();
       analyzeWithCollectiveJlResponse.results = [];
       for (const result of results) {
         analyzeWithCollectiveJlResponse.results.push(result as AnalyzeWithCollectiveJlResult);
       }
       res.send(analyzeWithCollectiveJlResponse);
-    } catch (err) {
-      internalServerError(res, err.toString());
-    }
+    }).catch((err) => internalServerError(res, err.toString()));
   });
 }

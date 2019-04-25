@@ -1,8 +1,11 @@
+import * as debugCreator from "debug";
 import * as fs from "fs";
 import * as readline from "readline";
 import * as zlib from "zlib";
 
 import { ValueTrieNode } from "./value_trie";
+
+const debug = debugCreator("solvent");
 
 const quadgramLogProbs: { [key: string]: number } = {};
 const quadgramLogProbTrie: number[][][][] = [];
@@ -14,6 +17,7 @@ let wordFloorLogProb: number;
 
 function loadData(): Promise<void> {
   const quadgramsPromise = new Promise((resolve, reject) => {
+    debug("Fitness stats initialization: reading quadgrams");
     const input = fs.createReadStream("data/english_quadgrams.txt.gz").pipe(zlib.createGunzip());
     const lineReader = readline.createInterface({ input });
 
@@ -27,6 +31,7 @@ function loadData(): Promise<void> {
     });
 
     lineReader.on("close", () => {
+      debug("Fitness stats initialization: building quadgram trie");
       for (const quadgramFrequency of quadgramFrequencies) {
         quadgramLogProbs[quadgramFrequency.quadgram] = Math.log(quadgramFrequency.frequency / n);
       }
@@ -57,11 +62,13 @@ function loadData(): Promise<void> {
         quadgramLogProbTrie.push(l1);
       }
 
+      debug("Fitness stats initialization: quadgram trie initialized");
       resolve();
     });
   });
 
   const wordsPromise = new Promise((resolve, reject) => {
+    debug("Fitness stats initialization: reading English words");
     const input = fs.createReadStream("data/english_words_50k.txt.gz").pipe(zlib.createGunzip());
     const lineReader = readline.createInterface({ input });
 
@@ -75,12 +82,14 @@ function loadData(): Promise<void> {
     });
 
     lineReader.on("close", () => {
+      debug("Fitness stats initialization: building word trie");
       for (const wordFrequency of wordFrequencies) {
         const logProb = Math.log(wordFrequency.frequency / n);
         wordLogProbs[wordFrequency.word] = logProb;
         wordLogProbsTrie.insert(wordFrequency.word, logProb);
       }
       wordFloorLogProb = Math.log(0.01 / n);
+      debug("Fitness stats initialization: word trie initialized");
       resolve();
     });
   });

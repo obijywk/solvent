@@ -1,7 +1,10 @@
+import * as debugCreator from "debug";
 import * as fs from "fs";
 import * as _ from "lodash";
 import * as readline from "readline";
 import * as zlib from "zlib";
+
+const debug = debugCreator("solvent");
 
 // tslint:disable:no-var-requires
 require("../../../build/Release/julia_loader");
@@ -21,7 +24,14 @@ export interface IFeatureResult {
 
 const buildCorpus: (words: string[]) => void = collectiveJl.buildCorpus;
 
+let resolveInitialize: () => void;
+
 export const initialized = new Promise((resolve, reject) => {
+  resolveInitialize = resolve;
+});
+
+export function initialize() {
+  debug("Collective.jl initialization: reading English words");
   const input = fs.createReadStream("data/english_words_50k.txt.gz").pipe(zlib.createGunzip());
   const lineReader = readline.createInterface({ input });
 
@@ -35,18 +45,30 @@ export const initialized = new Promise((resolve, reject) => {
   });
 
   lineReader.on("close", () => {
+    debug("Collective.jl initialization: building corpus");
     buildCorpus(words);
-    resolve();
+    debug("Collective.jl initialization: corpus built");
+    if (resolveInitialize !== undefined) {
+      resolveInitialize();
+    }
   });
-});
+}
 
-export function analyze(words: string[], options: Partial<IAnalyzeOptions> = {}): IFeatureResult[] {
-  const fullOptions = {
-    allowedMisses: 0,
-    maxResults: 10,
-    ...options,
-  };
-  const results: IFeatureResult[] = collectiveJl.analyze(words, fullOptions.allowedMisses);
-  const sortedResults = _.sortBy(results, "probability");
-  return _.take(sortedResults, fullOptions.maxResults);
+export function analyze(words: string[], options: Partial<IAnalyzeOptions> = {}): Promise<IFeatureResult[]> {
+  return new Promise((resolve, reject) => {
+    initialized.then(() => {
+      const fullOptions = {
+        allowedMisses: 0,
+        maxResults: 10,
+        ...options,
+      };
+      try {
+        const results: IFeatureResult[] = collectiveJl.analyze(words, fullOptions.allowedMisses);
+        const sortedResults = _.sortBy(results, "probability");
+        resolve(_.take(sortedResults, fullOptions.maxResults));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
 }

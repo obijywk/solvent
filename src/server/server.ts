@@ -83,14 +83,15 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   next(err);
 });
 
+debug("Waiting for initialization");
 Promise.all([
   clueDatabase.initialized,
-  collectiveJl.initialized,
   fitnessStats.initialized,
   nutrimatic.initialized,
 ]).then(() => {
   const port = process.env.PORT || 8080;
   app.listen(port, () => {
     debug(`Listening on port ${port}`);
+    collectiveJl.initialize();
   });
 });
