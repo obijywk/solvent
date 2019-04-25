@@ -1,7 +1,9 @@
-version: '3'
+version: '3.4'
 services:
   solvent:
-    build: .
+    build:
+      context: .
+      target: builder
     ports:
       - "8080:8080"
     volumes:
