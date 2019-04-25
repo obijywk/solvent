@@ -7,5 +7,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./src:/opt/solvent/src
+      - ./build:/opt/solvent/build
+      - ./built:/opt/solvent/built
       - ./dist:/opt/solvent/dist
+      - ./src:/opt/solvent/src
