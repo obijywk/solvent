@@ -22,12 +22,14 @@ export interface IFeatureResult {
   satisfied: string[];
 }
 
-const buildCorpus: (words: string[]) => void = collectiveJl.buildCorpus;
+const buildCorpus: (words: string[], callback: (err: string | null) => void) => void = collectiveJl.buildCorpus;
 
 let resolveInitialize: () => void;
+let rejectInitialize: (err: Error) => void;
 
 export const initialized = new Promise((resolve, reject) => {
   resolveInitialize = resolve;
+  rejectInitialize = reject;
 });
 
 export function initialize() {
@@ -46,11 +48,16 @@ export function initialize() {
 
   lineReader.on("close", () => {
     debug("Collective.jl initialization: building corpus");
-    buildCorpus(words);
-    debug("Collective.jl initialization: corpus built");
-    if (resolveInitialize !== undefined) {
-      resolveInitialize();
-    }
+    buildCorpus(words, (err) => {
+      if (err) {
+        rejectInitialize(new Error(err));
+        return;
+      }
+      debug("Collective.jl initialization: corpus built");
+      if (resolveInitialize !== undefined) {
+        resolveInitialize();
+      }
+    });
   });
 }
 

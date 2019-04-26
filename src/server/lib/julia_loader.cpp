@@ -6,7 +6,6 @@ using namespace Napi;
 
 Object Init(Env env, Object exports) {
   dlopen(JULIA_LIB_PATH, RTLD_GLOBAL | RTLD_LAZY);
-  jl_init(nullptr);
   return exports;
 }
 
