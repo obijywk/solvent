@@ -1,5 +1,6 @@
 FROM node:slim AS builder
 LABEL stage=builder
+USER root
 
 RUN apt-get update
 RUN apt-get install -y build-essential git libfst-dev python
@@ -55,14 +56,17 @@ RUN npm run build-native
 RUN npm run build-server
 RUN npm run build-client
 
+ENV HOME /root
+
 EXPOSE 8080
 CMD ["npm", "run", "run-server"]
 
 
 FROM node:slim
+USER root
 
 RUN apt-get update
-RUN apt-get install -y libfst4
+RUN apt-get install -y libfst4 python3
 
 COPY --from=builder /usr/local/lib/julia/ /usr/local/lib/julia/
 
@@ -84,5 +88,9 @@ COPY --from=builder /opt/solvent/public/ /opt/solvent/public/
 WORKDIR /opt/solvent
 RUN npm install --only=prod
 
+COPY set_julia_mtimes.py /opt/solvent/
+
+ENV HOME /root
+
 EXPOSE 8080
-CMD ["npm", "run", "run-server"]
+CMD ["npm", "run", "set-julia-mtimes-and-run-server"]

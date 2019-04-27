@@ -270,16 +270,31 @@ Value Analyze(const CallbackInfo& callback_info) {
 }
 
 Object Init(Env env, Object exports) {
-  jl_module_t* julia_collective;
+  jl_module_t* julia_collective = nullptr;
 
+  std::string error_string;
   julia_worker.Run([&] {
     jl_init(nullptr);
     jl_eval_string("using Collective");
+    if (jl_exception_occurred()) {
+      error_string = jl_typeof_str(jl_exception_occurred());
+      return;
+    }
     jl_eval_string("gc()");
+    if (jl_exception_occurred()) {
+      error_string = jl_typeof_str(jl_exception_occurred());
+      return;
+    }
     julia_collective = (jl_module_t*) jl_eval_string("Collective");
+    if (jl_exception_occurred()) {
+      error_string = jl_typeof_str(jl_exception_occurred());
+      return;
+    }
   });
 
-  if (julia_collective == nullptr) {
+  if (!error_string.empty()) {
+    Error::New(env, error_string).ThrowAsJavaScriptException();
+  } else if (julia_collective == nullptr) {
     Error::New(env, "Collective.jl Julia package not found.").ThrowAsJavaScriptException();
   } else {
     julia_worker.Run([&] {
