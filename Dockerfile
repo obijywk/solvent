@@ -66,7 +66,7 @@ FROM node:slim
 USER root
 
 RUN apt-get update
-RUN apt-get install -y libfst4 python3
+RUN apt-get install -y libfst4
 
 COPY --from=builder /usr/local/lib/julia/ /usr/local/lib/julia/
 
@@ -88,9 +88,7 @@ COPY --from=builder /opt/solvent/public/ /opt/solvent/public/
 WORKDIR /opt/solvent
 RUN npm install --only=prod
 
-COPY set_julia_mtimes.py /opt/solvent/
-
 ENV HOME /root
 
 EXPOSE 8080
-CMD ["npm", "run", "set-julia-mtimes-and-run-server"]
+CMD ["npm", "run", "run-server"]
